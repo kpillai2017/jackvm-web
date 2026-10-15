@@ -108,7 +108,12 @@ body { height:100vh; height:100dvh; min-height:0; display:grid; grid-template-ro
 /* Container query units make the canvas fit both the available width AND
    height without JS resizing, pixel stretching, clipping or page scrolling.
    cqw/cqh refer only to screen-frame, not to the viewport or source column. */
-.screen-frame { min-width:0; min-height:0; margin:.5rem; container-type:size; display:grid; place-items:center; }
+.screen-frame { position:relative; min-width:0; min-height:0; margin:.5rem; container-type:size; display:grid; place-items:center; }
+/* HTML prompt is separate from the framebuffer; it never writes to Hack RAM.
+   Ignore pointer events so clicking the screen still gives keyboard focus. */
+.start-prompt { position:absolute; z-index:1; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.45rem; padding:1rem; text-align:center; pointer-events:none; font-size:clamp(.75rem,2cqw,1.1rem); }
+.start-prompt strong { font-size:1.25em; }
+.start-prompt[hidden] { display:none; }
 .display-canvas { width:min(100cqw,200cqh); height:auto; max-width:100%; max-height:100%; margin:0; aspect-ratio:2 / 1; }
 .source-pane { min-height:0; display:flex; flex-direction:column; }
 .source-pane[hidden] { display:none; }

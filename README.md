@@ -4,7 +4,8 @@ A modular browser-only interpreter for standard nand2tetris Jack VM code. The
 CPU is **AssemblyScript compiled to WebAssembly**; JavaScript handles parsing,
 linking, local file selection, scheduling, keyboard input and the canvas.
 A **built-in Jack OS is automatically embedded** via `web/builtin-os.js`, and
-**Sokoban is bundled and preloaded at startup, paused**. Press **Run** to begin;
+**Sokoban is bundled and preloaded at startup, paused**. The screen shows
+**“Press the Run button to start the game.”** until execution begins. Press **Run** to begin;
 click **Load Sokoban** to restore the bundled game. Click **Choose** to load custom
 local files privately (no upload). The embedded OS provides standard Jack libraries
 (Memory, Math, Screen, Output, Keyboard and others); user programs win where they

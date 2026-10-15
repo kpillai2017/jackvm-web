@@ -96,7 +96,7 @@ async function local(event, append=false, builtinName='') {
     player.onFrame=refresh;
     player.onStatusChange=message=>{status(runtime.status===2 ? describe(2) : message);buttons();};
     $('source-file-select').replaceChildren(...files.map((file,i)=>new Option(file.name,i)));
-    display.clear();display.render(runtime.ram);
+    display.clear();display.render(runtime.ram);$('start-prompt').hidden=false;
     const message=builtinName
       ? `Ready — ${builtinName} loaded with built-in Jack OS. Press Run to play, or Choose your own program.`
       : `Loaded ${selectedFiles.length} local VM file(s)${linked.builtinFiles.length ? ' + built-in Jack OS' : ''} — press Run, then use the focused screen.`;
@@ -138,14 +138,15 @@ $('add-files').addEventListener('change',event=>local(event,true));
 $('add-folder').addEventListener('change',event=>local(event,true));
 $('run-btn').addEventListener('click',()=>{
   if(!runtime || loading || runtime.status!==0) return;
+  $('start-prompt').hidden=true;
   player.start();canvas.focus();status('Running');buttons();
 });
 $('pause-btn').addEventListener('click',()=>pause());
 $('step-btn').addEventListener('click',()=>{
-  if(!runtime || loading) return;pause();const code=player.step(performance.now());status(describe(code));refresh();
+  if(!runtime || loading) return;$('start-prompt').hidden=true;pause();const code=player.step(performance.now());status(describe(code));refresh();
 });
 $('reset-btn').addEventListener('click',()=>{
-  if(!runtime || loading) return;pause();runtime.reset();display.clear();display.render(runtime.ram);status('Reset — paused');refresh();
+  if(!runtime || loading) return;pause();runtime.reset();display.clear();display.render(runtime.ram);$('start-prompt').hidden=false;status('Reset — paused');refresh();
 });
 function setSpeed(budget) {
   $('speed-slider').value=String(budget);

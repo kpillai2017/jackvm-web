@@ -76,6 +76,8 @@ input[type=range] { accent-color:var(--accent); }
 #choose-dialog { background:var(--surface); color:var(--text); border:1px solid var(--control-border); }
 /* The emulated framebuffer has its own palette; never recolor VM pixels. */
 .display-canvas { background:#000000; }
+.start-prompt { color:var(--text); }
+.start-prompt strong { color:var(--accent); }
 /* Respect OS high-contrast settings instead of locking decorative colors. */
 @media(forced-colors:active) {
   :focus-visible,.display-canvas:focus-visible { outline:3px solid Highlight; }

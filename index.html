@@ -55,6 +55,10 @@
           <!-- Size container constrains CSS pixels by BOTH available dimensions;
                the underlying VM framebuffer always remains exactly 512×256. -->
           <div class="screen-frame">
+            <div id="start-prompt" class="start-prompt" role="status" hidden>
+              <strong>Ready to play</strong>
+              <span>Press the Run button to start the game.</span>
+            </div>
             <canvas id="display-canvas" class="display-canvas" width="512" height="256" tabindex="0" aria-label="VM game screen; click to focus keyboard input" title="Click to focus keyboard input"></canvas>
           </div>
           <div class="canvas-info"><small>Click the screen for keyboard input. Left / Up / Right / Down use Hack codes 130 / 131 / 132 / 133.</small></div>
