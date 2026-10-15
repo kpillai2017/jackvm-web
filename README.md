@@ -48,7 +48,15 @@ plugin, Jack compiler, or local server. Sokoban loads automatically and starts p
    **right sidebar**. The game screen fills the main workspace by default.
 7. Click **Show source** above the game to open the VM source panel and shrink
    the game into a split view. **Hide source** restores the large game view.
-   Changing views does not reset or pause execution. On narrow screens the
+   Changing views does not reset or pause execution.
+   The **red ▶** marks the current instruction (the next instruction to execute)
+   and automatically scrolls into view after steps, calls, returns and jumps.
+   The **light-blue ↳** marks the active caller's call instruction. When the
+   caller is in another file, use **Show Caller** to inspect it, then click the
+   same button (**Show Current**) to return without executing an instruction.
+   Its label shows the caller location in light blue and callee function in red.
+   The next execution step also resumes following the current instruction. Entry points have no
+   caller marker. Only the source panel scrolls, not the whole page. On narrow screens the
    panels stack vertically rather than squeeze into unreadable columns.
 
 The player fits the browser viewport without page scrolling. The game scales

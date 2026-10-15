@@ -11,7 +11,7 @@ the repository's Actions tab: https://github.com/kpillai2017/jackvm-web/actions 
 - `npm test`: **20 passed**. Compiles and exercises the real WASM CPU,
   including merged multi-class static isolation, built-in OS linking, and
   complete missing-call lists.
-- `PLAYWRIGHT_BROWSERS_PATH=0 npm run test:browser`: **32 passed**,
+- `PLAYWRIGHT_BROWSERS_PATH=0 npm run test:browser`: **34 passed**,
   using Chromium. This command rebuilds the application with embedded OS and
   bundled Sokoban first.
 - The project and dist include Sokoban bundled (seven VM files, GPL2-licensed,

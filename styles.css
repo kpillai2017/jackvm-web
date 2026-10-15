@@ -45,6 +45,13 @@ input::file-selector-button { border:0; border-radius:3px; padding:.35rem .45rem
 .source-pane { overflow:hidden; }
 .source-pane[hidden] { display:none; }
 .source-code { white-space:pre; overflow:auto; height:clamp(300px,55vh,680px); padding:1rem; font:.8rem/1.7 ui-monospace,SFMono-Regular,Consolas,monospace; background:#131427; color:#dce5fa; tab-size:4; }
+.source-tools { flex:0 0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:.3rem .7rem; padding:.35rem .6rem; font-size:.72rem; }
+.source-legend { display:flex; gap:.7rem; }
+#source-caller { max-width:100%; white-space:normal; text-align:left; overflow-wrap:anywhere; }
+.source-nav-action { font-weight:600; }
+.source-line { min-height:1.7em; width:max-content; min-width:100%; }
+.source-marker { display:inline-block; width:1.5em; font-weight:700; }
+.source-number { opacity:.8; }
 .placeholder { white-space:normal; color:#929ab8; text-align:center; padding:3rem .5rem; }
 .file-select { max-width:100%; min-width:0; padding:.35rem; font-size:.8rem; border:1px solid #ffffff25; border-radius:4px; background:#292a46; color:#fff; }
 .control-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; margin-bottom:1rem; }

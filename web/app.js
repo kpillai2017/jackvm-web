@@ -5,6 +5,7 @@
  * program paused. The selection is retained so missing OS/classes can be added.
  */
 import {linkProgram} from './linker.js';
+import {SourceView} from './source-view.js';
 import {Runtime, FAULTS} from './runtime.js';
 import {Display} from './display.js';
 import {Keyboard} from './keyboard.js';
@@ -13,6 +14,7 @@ const $ = id => document.getElementById(id);
 const canvas = $('display-canvas');
 const display = new Display(canvas);
 const keyboard = new Keyboard(canvas);
+const sourceViewer=new SourceView($('source-code'),$('source-file-select'),$('source-caller'));
 let runtime, player, program, files=[], selectedFiles=[], loadVersion=0, loading=false;
 function feedbackTone(message) {
   return /(?:failed|fault|error|cannot run|still needs|no \.vm files)/i.test(message) ? 'error'
@@ -42,12 +44,7 @@ function sourceView() {
   // Source rendering can be expensive for OS/library files. Do no hidden work
   // in game mode; populate the panel on demand when the user reveals it.
   if(!program || $('source-pane').hidden) return;
-  const location=program.locations[runtime.pc];
-  // Follow the current instruction; the selector can also browse files manually.
-  if(location) $('source-file-select').value=files.findIndex(f=>f.name===location.file);
-  const file=files[Number($('source-file-select').value)];
-  if(file) $('source-code').textContent=file.source.split('\n').map((text,i)=>
-    `${location?.file===file.name && location.line===i+1 ? '▶':' '} ${String(i+1).padStart(4)} ${text}`).join('\n');
+  sourceViewer.update(runtime);
 }
 function refresh() {
   if(!runtime) return;
@@ -91,6 +88,7 @@ async function local(event, append=false, builtinName='') {
     const next=await Runtime.create();next.load(linked);
     if(version!==loadVersion) return;
     runtime=next;program=linked;files=[...selectedFiles,...linked.builtinFiles];
+    sourceViewer.load(program,files);
     player=new Player(runtime,display,keyboard);
     player.setBudget(Number($('speed-slider').value));
     player.onFrame=refresh;
@@ -167,7 +165,7 @@ $('source-toggle').addEventListener('click',()=>{
   // canvas remains the same element and retains its framebuffer and resolution.
 });
 $('source-file-select').addEventListener('change',()=>{
-  const file=files[Number($('source-file-select').value)];if(file) $('source-code').textContent=file.source;
+  sourceViewer.browse(Number($('source-file-select').value));
 });
 $('mem-inspect-btn').addEventListener('click',()=>{
   if(!runtime) return;

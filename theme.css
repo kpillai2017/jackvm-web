@@ -74,6 +74,11 @@ input[type=range] { accent-color:var(--accent); }
   outline:3px solid var(--focus); outline-offset:3px;
 }
 #choose-dialog { background:var(--surface); color:var(--text); border:1px solid var(--control-border); }
+/* Instruction markers use distinct shapes and labels as well as colors. */
+.source-current .source-marker,.current-key { color:#f87171; }
+.source-caller:not(.source-current) .source-marker,.caller-key { color:#7dd3fc; }
+.source-current { background:#f8717112; }
+.source-caller:not(.source-current) { background:#7dd3fc0d; }
 /* The emulated framebuffer has its own palette; never recolor VM pixels. */
 .display-canvas { background:#000000; }
 .start-prompt { color:var(--text); }

@@ -68,6 +68,10 @@
             <h2 id="source-heading">VM source</h2>
             <select id="source-file-select" class="file-select" aria-label="VM source file"><option value="">— Select file —</option></select>
           </div>
+          <div class="source-tools">
+            <span class="source-legend"><span class="current-key">▶ Current</span> <span class="caller-key">↳ Caller</span></span>
+            <button id="source-caller" class="btn btn-small" type="button" disabled>↳ Caller: none (entry point)</button>
+          </div>
           <div id="source-code" class="source-code"><div class="placeholder">Load a program to view source code</div></div>
         </section>
       </section>

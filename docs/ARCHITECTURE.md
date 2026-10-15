@@ -162,6 +162,22 @@ per nominal 60Hz frame. Catch-up is capped at three frames. Source-pane refresh
 is throttled to avoid rebuilding thousands of lines every frame. Hidden tabs
 pause. No scheduler can guarantee exact game speed across machines.
 
+## Source tracking and active callers
+
+`web/source-view.js` renders source as safe text nodes in per-line rows. It
+rebuilds rows only when changing file, then updates the red current marker and
+light-blue caller marker. After each visible debugger refresh, the current row
+is scrolled into the source panel's viewport. The document and game panels are
+never scrolled by instruction navigation. Hidden source incurs no rendering work.
+
+PC identifies the next instruction to execute. The active caller is derived
+from the current frame's saved return address: `RAM[LCL-5] - 1`. The renderer
+validates the frame range, return address and call opcode, and ignores the
+synthetic bootstrap sentinel. Returns naturally reveal the outer caller after
+restoring LCL. A labeled caller button provides cross-file navigation without
+changing machine state. User browsing is allowed while paused; the next
+execution refresh follows PC again. No debugger shadow stack is required.
+
 ## 6. Loading and distribution
 
 Sokoban is bundled and preloaded at startup, paused. Users can press **Run** to play
