@@ -1,0 +1,12 @@
+{
+  "targets": {
+    "release": {
+      "outFile": "web/runtime.wasm",
+      "optimizeLevel": 3,
+      "shrinkLevel": 1,
+      "noAssert": false
+    },
+    "debug": { "outFile": "web/runtime.wasm", "debug": true }
+  },
+  "options": { "runtime": "stub", "exportRuntime": false }
+}

@@ -1,0 +1,27 @@
+name: CI
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run build
+      - name: Verify public artifacts
+        run: |
+          test -f dist/index.html
+          test -f dist/styles.css
+          test -f dist/web/runtime.wasm
+          test ! -d dist/games
+          test ! -d dist/os
+          test ! -d dist/examples
+          test -z "$(find dist -type f -iname '*.vm' -print -quit)"

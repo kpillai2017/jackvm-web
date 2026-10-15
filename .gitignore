@@ -1,0 +1,32 @@
+# Build output
+dist/
+build/
+*.wasm
+
+# Node and dependencies
+node_modules/
+*.log
+npm-debug.log*
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS generated files
+Thumbs.db
+.LSOverride
+
+# Test coverage
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

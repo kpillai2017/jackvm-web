@@ -1,0 +1,17 @@
+{
+  "name": "jackvm-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A teaching-oriented WebAssembly Jack VM for GitHub Pages",
+  "scripts": {
+    "build:wasm": "asc assembly/index.ts --config asconfig.json --target release",
+    "package": "node tools/package.mjs",
+    "build": "npm run build:wasm && npm run package",
+    "test": "npm run build:wasm && node --test tests/*.test.mjs",
+    "serve": "node tools/serve.mjs",
+    "test:browser": "npm run build && playwright test"
+  },
+  "devDependencies": { "assemblyscript": "0.28.9", "@playwright/test": "1.56.1" },
+  "engines": { "node": ">=22" }
+}

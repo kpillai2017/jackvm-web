@@ -1,0 +1,85 @@
+/* Semantic color tokens. Layout lives in styles.css; this file owns visual
+ * roles so a theme can change without touching sizing, VM state or rendering.
+ * Text pairs target WCAG AA 4.5:1; active control boundaries/focus target 3:1.
+ * Muted does NOT mean low opacity. Disabled controls keep readable labels and
+ * use explicit neutral styling. Color always accompanies text, never replaces it.
+ */
+:root {
+  color-scheme:dark;
+  --bg:#0f172a;
+  --surface:#1e293b;
+  --surface-inset:#111c2e;
+  --surface-hover:#334155;
+  --border:#475569;
+  --control-border:#94a3b8;
+  --text:#f1f5f9;
+  --text-secondary:#cbd5e1;
+  --text-muted:#94a3b8;
+  --accent:#7dd3fc;
+  --accent-hover:#bae6fd;
+  --focus:#38bdf8;
+  --primary:#0369a1;
+  --primary-hover:#075985;
+  --on-primary:#ffffff;
+  --success:#064e3b;
+  --success-hover:#065f46;
+  --success-text:#a7f3d0;
+  --warning:#78350f;
+  --warning-hover:#92400e;
+  --warning-text:#fef3c7;
+  --danger:#fda4af;
+  --disabled-bg:#1e293b;
+  --disabled-text:#94a3b8;
+}
+:root,body { background:var(--bg); color:var(--text); }
+.header { background:var(--surface-inset); border-color:var(--border); }
+h2,.title { color:var(--text); }
+.subtitle,.resolution,.canvas-info,.file-list,.status-label,.footer,.placeholder { color:var(--text-muted); }
+label,.status-message { color:var(--text-secondary); }
+.panel-section,.canvas-pane,.source-pane { background:var(--surface); border-color:var(--border); }
+.pane-header { background:var(--surface-inset); border-color:var(--border); }
+.source-code,.memory-display { background:var(--surface-inset); color:var(--text-secondary); }
+input[type=file],.memory-controls input,.file-select {
+  background:var(--surface-inset); color:var(--text); border-color:var(--control-border);
+}
+input::file-selector-button {
+  background:var(--surface-hover); color:var(--text); border:1px solid var(--control-border);
+}
+input:not(:disabled)::file-selector-button:hover { background:var(--border); }
+.btn { background:var(--surface-hover); color:var(--text); border-color:var(--control-border); }
+.btn:hover:not(:disabled) { background:var(--border); }
+/* Source is the single accent action. Run/Pause have distinct semantic fills,
+   reinforced by their written labels and icons for color-vision deficiencies. */
+#source-toggle { background:var(--primary); color:var(--on-primary); }
+#source-toggle:hover { background:var(--primary-hover); }
+.btn-play { background:var(--success); color:var(--success-text); }
+.btn-play:hover:not(:disabled) { background:var(--success-hover); }
+.btn-pause { background:var(--warning); color:var(--warning-text); }
+.btn-pause:hover:not(:disabled) { background:var(--warning-hover); }
+button:disabled,input:disabled,.btn:disabled {
+  opacity:1; background:var(--disabled-bg); color:var(--disabled-text);
+  border-color:var(--border); cursor:not-allowed;
+}
+input:disabled::file-selector-button { background:var(--disabled-bg); color:var(--disabled-text); border-color:var(--border); cursor:not-allowed; }
+a,.extra-files summary,#speed-display { color:var(--accent); }
+a { text-decoration:underline; text-underline-offset:.18em; }
+a:hover,.extra-files summary:hover { color:var(--accent-hover); }
+input[type=range] { accent-color:var(--accent); }
+.status-display { border-color:var(--border); }
+.status-value { color:var(--text-secondary); }
+#status-value { color:var(--accent); }
+#status-value[data-tone=error],#load-feedback[data-tone=error] { color:var(--danger); }
+#status-value[data-tone=success],#load-feedback[data-tone=success] { color:var(--success-text); }
+:focus-visible,.display-canvas:focus-visible {
+  outline:3px solid var(--focus); outline-offset:3px;
+}
+#choose-dialog { background:var(--surface); color:var(--text); border:1px solid var(--control-border); }
+/* The emulated framebuffer has its own palette; never recolor VM pixels. */
+.display-canvas { background:#000000; }
+/* Respect OS high-contrast settings instead of locking decorative colors. */
+@media(forced-colors:active) {
+  :focus-visible,.display-canvas:focus-visible { outline:3px solid Highlight; }
+  .btn,input,.file-select { border-color:ButtonText; }
+  button:disabled,input:disabled { color:GrayText; }
+  .display-canvas { forced-color-adjust:none; }
+}

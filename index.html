@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jack VM — Web Player</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <h1 class="title">Jack VM Player</h1>
+      <p class="subtitle">A WebAssembly machine for Jack VM programs</p>
+    </div>
+  </header>
+
+  <!-- Game first in both visual and document order. The sidebar is on the right
+       on desktop; narrow screens stack it below rather than shrink the game. -->
+  <main class="container">
+    <section class="workspace" aria-label="Game and program workspace">
+      <section class="panel-section program-panel" aria-labelledby="program-heading">
+        <h2 id="program-heading">Select Program</h2>
+        <p class="status-message">Choose your program, then press Run. Jack OS is built in; files stay on your device.</p>
+        <div class="choose-row">
+          <span id="program-choice-label">VM files or a folder of VMs</span>
+          <button id="program-choose" class="btn" type="button" aria-describedby="program-choice-label" aria-haspopup="dialog">Choose</button>
+        </div>
+        <!-- Native inputs remain available to the File API but have no visible
+             filename boxes. One public button routes to either browser picker. -->
+        <input type="file" id="local-folder" webkitdirectory multiple accept=".vm" hidden>
+        <input type="file" id="local-files" multiple accept=".vm" hidden>
+        <details class="extra-files">
+          <summary>Optional: extra classes or custom OS overrides</summary>
+          <div class="choose-row">
+            <span id="extra-choice-label">Extra VM files or a folder</span>
+            <button id="extra-choose" class="btn" type="button" aria-describedby="extra-choice-label" aria-haspopup="dialog" disabled>Choose</button>
+          </div>
+          <input type="file" id="add-files" multiple accept=".vm" disabled hidden>
+          <input type="file" id="add-folder" webkitdirectory multiple accept=".vm" disabled hidden>
+        </details>
+        <div id="load-feedback" class="status-message" role="status" aria-live="polite"></div>
+        <div id="file-list" class="file-list"></div>
+      </section>
+
+      <!-- Hidden source is a native hidden element, not merely an empty column.
+           Opening it switches the grid to a compact canvas + source workspace. -->
+      <section id="display-area" class="display-area" aria-label="VM display">
+        <div class="canvas-pane">
+          <div class="pane-header">
+            <h2>Game screen <span class="resolution">512×256</span></h2>
+            <button id="source-toggle" class="btn btn-small" type="button" aria-expanded="false" aria-controls="source-pane">Show source</button>
+          </div>
+          <!-- Size container constrains CSS pixels by BOTH available dimensions;
+               the underlying VM framebuffer always remains exactly 512×256. -->
+          <div class="screen-frame">
+            <canvas id="display-canvas" class="display-canvas" width="512" height="256" tabindex="0" aria-label="VM game screen; click to focus keyboard input" title="Click to focus keyboard input"></canvas>
+          </div>
+          <div class="canvas-info"><small>Click the screen for keyboard input. Left / Up / Right / Down use Hack codes 130 / 131 / 132 / 133.</small></div>
+        </div>
+        <section id="source-pane" class="source-pane" aria-labelledby="source-heading" hidden>
+          <div class="pane-header">
+            <h2 id="source-heading">VM source</h2>
+            <select id="source-file-select" class="file-select" aria-label="VM source file"><option value="">— Select file —</option></select>
+          </div>
+          <div id="source-code" class="source-code"><div class="placeholder">Load a program to view source code</div></div>
+        </section>
+      </section>
+    </section>
+
+    <aside class="control-panel" aria-label="Playback, memory and documentation">
+      <section class="panel-section" aria-labelledby="playback-heading">
+        <h2 id="playback-heading">Playback</h2>
+        <div class="control-buttons">
+          <button id="run-btn" class="btn btn-play" title="Run program">▶ Run</button>
+          <button id="pause-btn" class="btn btn-pause" disabled title="Pause execution">⏸ Pause</button>
+          <button id="step-btn" class="btn btn-step" title="Execute one instruction">⏭ Step</button>
+          <button id="reset-btn" class="btn btn-reset" title="Reset program">⟲ Reset</button>
+        </div>
+        <div class="control-group">
+          <label for="speed-slider">Speed (instructions/frame):</label>
+          <input type="range" id="speed-slider" min="1000" max="1000000" step="1000" value="40000">
+          <div class="speed-actions">
+            <span id="speed-display">40,000</span>
+            <button id="speed-original" class="btn btn-small" type="button" title="Restore original web player speed: 40,000 instructions/frame">Original</button>
+          </div>
+        </div>
+        <div class="status-display">
+          <div class="status-row"><span class="status-label">Status:</span><span id="status-value" class="status-value" role="status" aria-live="polite">Ready</span></div>
+          <div class="status-row"><span class="status-label">Instructions:</span><span id="instr-count" class="status-value">0</span></div>
+          <div class="status-row"><span class="status-label">PC:</span><span id="pc-value" class="status-value">0</span></div>
+          <div class="status-row"><span class="status-label">Error:</span><span id="error-value" class="status-value">None</span></div>
+        </div>
+      </section>
+      <section class="panel-section" aria-labelledby="memory-heading">
+        <h2 id="memory-heading">Memory Inspector</h2>
+        <div class="memory-controls">
+          <input type="number" id="mem-address" aria-label="RAM address to inspect" min="0" max="32767" value="0">
+          <button id="mem-inspect-btn" class="btn btn-small">Inspect</button>
+        </div>
+        <div id="memory-display" class="memory-display">Choose an address to inspect RAM.</div>
+      </section>
+      <section class="panel-section info-section" aria-labelledby="docs-heading">
+        <h2 id="docs-heading">Documentation</h2>
+        <ul class="info-links">
+          <li><a href="./README.md" target="_blank" rel="noopener">README</a></li>
+          <li><a href="./docs/ARCHITECTURE.md" target="_blank" rel="noopener">Architecture</a></li>
+          <li><a href="./docs/STUDY_GUIDE.md" target="_blank" rel="noopener">Study guide</a></li>
+          <li><a href="./docs/ATTRIBUTION.md" target="_blank" rel="noopener">Attribution</a></li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+  <footer class="footer"><p>© 2026 kpillai2017 — Jack VM Web Player. <a href="https://www.nand2tetris.org/" target="_blank" rel="noopener">nand2tetris</a></p></footer>
+  <dialog id="choose-dialog" aria-labelledby="choose-heading">
+    <h2 id="choose-heading">Choose a program</h2>
+    <p>What would you like to select?</p>
+    <div class="choose-actions">
+      <button id="choose-files" class="btn" type="button">VM files</button>
+      <button id="choose-folder" class="btn" type="button">Folder of VMs</button>
+      <button id="choose-cancel" class="btn" type="button">Cancel</button>
+    </div>
+  </dialog>
+  <script type="module" src="web/app.js"></script>
+</body>
+</html>
