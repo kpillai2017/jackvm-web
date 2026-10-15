@@ -1,0 +1,468 @@
+// Board.jack
+// Core Sokoban game board management.
+// Manages terrain (walls/floors/goals), box positions, player position, and game state.
+// Integrates with History for undo and Levels for loading puzzles.
+// Fixed grid: 20 wide × 16 tall = 320 cells max.
+
+class Board {
+    // Terrain and box state
+    field Array terrain;    // terrain[i] = 0 void, 1 wall, 2 floor, 3 goal
+    field Array boxes;      // boxes[i] = true if box at index i
+
+    // Current board state
+    field int width;        // Actual width of loaded level (1..20)
+    field int height;       // Actual height of loaded level (1..16)
+    field int playerPos;    // Current player position (0..319)
+    field int level;        // Current level number (1..50)
+
+    // Move counters
+    field int moveCount;    // Total moves (max 32767)
+    field int pushCount;    // Total pushes
+
+    // History and box count
+    field History history;  // Undo history
+    field int boxCount;     // Number of boxes on the board
+
+    /** Creates a new board with empty history. Terrain and boxes uninitialized. */
+    constructor Board new() {
+        let terrain = Array.new(320);
+        let boxes = Array.new(320);
+        let history = History.new();
+
+        let width = 0;
+        let height = 0;
+        let playerPos = 0;
+        let level = 0;
+        let moveCount = 0;
+        let pushCount = 0;
+        let boxCount = 0;
+
+        return this;
+    }
+
+    /** Disposes board, terrain, boxes, and history. */
+    method void dispose() {
+        do terrain.dispose();
+        do boxes.dispose();
+        do history.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /**
+     * Clears all game state: resets terrain, boxes, history, counters.
+     * Does NOT allocate new arrays—reuses existing ones.
+     * Called before load() to reset the board.
+     */
+    method void clear() {
+        var int i;
+
+        // Zero out all terrain and boxes
+        let i = 0;
+        while (i < 320) {
+            let terrain[i] = 0;
+            let boxes[i] = false;
+            let i = i + 1;
+        }
+
+        // Reset state
+        let width = 0;
+        let height = 0;
+        let playerPos = 0;
+        let level = 0;
+        let moveCount = 0;
+        let pushCount = 0;
+        let boxCount = 0;
+
+        // Clear history
+        do history.clear();
+
+        return;
+    }
+
+    /**
+     * Sets the board dimensions. Called during level loading.
+     * w: width (1..20), h: height (1..16)
+     */
+    method void setSize(int w, int h) {
+        let width = w;
+        let height = h;
+        return;
+    }
+
+    /**
+     * Loads a row of terrain from a text string.
+     * text: String literal consumed and disposed by this call
+     * y: row index (0..15)
+     * Character encoding:
+     *   '-' = void (0)
+     *   '#' = wall (1)
+     *   ' ' = floor (2)
+     *   '.' = goal (3)
+     *   '$' = floor + box (2, box placed)
+     *   '*' = goal + box (3, box placed)
+     *   '@' = floor + player (2, player placed)
+     *   '+' = goal + player (3, player placed)
+     */
+    method void row(String text, int y) {
+        var int x, pos, ch, terrainCode;
+        var boolean hasBox;
+
+        let x = 0;
+        while (x < text.length()) {
+            let pos = (y * 20) + x;
+            let ch = text.charAt(x);
+            let terrainCode = 0;
+            let hasBox = false;
+
+            // Parse character and set terrain / box state
+            if (ch = 45) {  // '-'
+                let terrainCode = 0;  // void
+            }
+            if (ch = 35) {  // '#'
+                let terrainCode = 1;  // wall
+            }
+            if (ch = 32) {  // ' '
+                let terrainCode = 2;  // floor
+            }
+            if (ch = 46) {  // '.'
+                let terrainCode = 3;  // goal
+            }
+            if (ch = 36) {  // '$'
+                let terrainCode = 2;  // floor
+                let hasBox = true;
+            }
+            if (ch = 42) {  // '*'
+                let terrainCode = 3;  // goal
+                let hasBox = true;
+            }
+            if (ch = 64) {  // '@'
+                let terrainCode = 2;  // floor
+                let playerPos = pos;
+            }
+            if (ch = 43) {  // '+'
+                let terrainCode = 3;  // goal
+                let playerPos = pos;
+            }
+
+            // Store terrain
+            let terrain[pos] = terrainCode;
+
+            // Store box and count
+            if (hasBox) {
+                let boxes[pos] = true;
+                let boxCount = boxCount + 1;
+            } else {
+                let boxes[pos] = false;
+            }
+
+            let x = x + 1;
+        }
+
+        // Dispose the string as required
+        do text.dispose();
+
+        return;
+    }
+
+    /** Returns the actual width of the loaded level. */
+    method int getWidth() {
+        return width;
+    }
+
+    /** Returns the actual height of the loaded level. */
+    method int getHeight() {
+        return height;
+    }
+
+    /** Returns the current level number (1..50). */
+    method int getLevel() {
+        return level;
+    }
+
+    /** Returns the current player position index (0..319). */
+    method int getPlayer() {
+        return playerPos;
+    }
+
+    /** Returns total move count. */
+    method int getMoves() {
+        return moveCount;
+    }
+
+    /** Returns total push count. */
+    method int getPushes() {
+        return pushCount;
+    }
+
+    /** Returns number of boxes on the board. */
+    method int getBoxCount() {
+        return boxCount;
+    }
+
+    /**
+     * Returns terrain type at given index.
+     * Returns 0 (void) if index is out of bounds.
+     * 0=void, 1=wall, 2=floor, 3=goal
+     */
+    method int terrainAt(int index) {
+        if ((index < 0) | (index > 319)) {
+            return 0;  // Out of bounds is void
+        }
+        return terrain[index];
+    }
+
+    /**
+     * Returns whether a box exists at the given index.
+     * Returns false if index is out of bounds.
+     */
+    method boolean boxAt(int index) {
+        if ((index < 0) | (index > 319)) {
+            return false;
+        }
+        return boxes[index];
+    }
+
+    /**
+     * Sets or clears a box at the given index.
+     * Does not validate bounds; caller must ensure validity.
+     */
+    method void setBox(int index, boolean present) {
+        let boxes[index] = present;
+        return;
+    }
+
+    /** Sets the player position to the given index. */
+    method void setPlayer(int index) {
+        let playerPos = index;
+        return;
+    }
+
+    /**
+     * Directly sets move and push counters.
+     * Used for state restoration.
+     */
+    method void setCounters(int moves, int pushes) {
+        let moveCount = moves;
+        let pushCount = pushes;
+        return;
+    }
+
+    /** Clears all history without affecting board state. */
+    method void clearHistory() {
+        do history.clear();
+        return;
+    }
+
+    /**
+     * Attempts to move the player by (dx, dy).
+     * Only cardinal moves: (-1,0) left, (0,-1) up, (1,0) right, (0,1) down.
+     * Validates terrain and boxes atomically.
+     * Returns false if invalid (wall, out of bounds, box jam, or move count at max).
+     * On success: updates player position, pushes history, increments move counter.
+     * If a box is pushed onto a valid cell, increments push counter.
+     */
+    method boolean move(int dx, int dy) {
+        var int newPos, newNewPos, terrain1, terrain2;
+        var boolean boxPresent, isPush;
+        var int actionCode;
+
+        // Reject non-cardinal commands before touching state or history.
+        if (~(((dx = -1) & (dy = 0)) | ((dx = 1) & (dy = 0)) |
+              ((dx = 0) & (dy = -1)) | ((dx = 0) & (dy = 1)))) {
+            return false;
+        }
+        // Prevent a horizontal step wrapping across the fixed-stride edge.
+        if ((dx = -1) & ((playerPos - ((playerPos / 20) * 20)) = 0)) { return false; }
+        if ((dx = 1) & ((playerPos - ((playerPos / 20) * 20)) = 19)) { return false; }
+
+        // Reject if already at move limit
+        if (moveCount = 32767) {
+            return false;
+        }
+
+        // Calculate new position
+        let newPos = playerPos + (dy * 20) + dx;
+
+        // Check bounds
+        if ((newPos < 0) | (newPos > 319)) {
+            return false;
+        }
+
+        // Get terrain at new position
+        let terrain1 = terrain[newPos];
+
+        // Reject if wall or void
+        if ((terrain1 = 1) | (terrain1 = 0)) {
+            return false;
+        }
+
+        // Check if box is present at new position
+        let boxPresent = boxes[newPos];
+
+        if (boxPresent) {
+            // Player is pushing a box: check if box can move to newNewPos
+            let newNewPos = newPos + (dy * 20) + dx;
+
+            // Check bounds
+            if ((newNewPos < 0) | (newNewPos > 319)) {
+                return false;
+            }
+
+            // Check terrain at box destination
+            let terrain2 = terrain[newNewPos];
+            if ((terrain2 = 1) | (terrain2 = 0)) {
+                return false;
+            }
+
+            // Check if a box is already at destination (box jam)
+            if (boxes[newNewPos]) {
+                return false;
+            }
+
+            // Valid push: move box
+            let boxes[newPos] = false;
+            let boxes[newNewPos] = true;
+            let isPush = true;
+
+            // Increment push counter
+            let pushCount = pushCount + 1;
+        } else {
+            // Simple move, no box
+            let isPush = false;
+        }
+
+        // Move player
+        let playerPos = newPos;
+
+        // Encode direction: 0=left, 1=up, 2=right, 3=down
+        let actionCode = 0;
+        if ((dx = -1) & (dy = 0)) {
+            let actionCode = 0;  // left
+        }
+        if ((dx = 0) & (dy = -1)) {
+            let actionCode = 1;  // up
+        }
+        if ((dx = 1) & (dy = 0)) {
+            let actionCode = 2;  // right
+        }
+        if ((dx = 0) & (dy = 1)) {
+            let actionCode = 3;  // down
+        }
+
+        // Add push flag if applicable
+        if (isPush) {
+            let actionCode = actionCode + 4;
+        }
+
+        // Record move in history
+        do history.push(playerPos, actionCode);
+
+        // Increment move counter
+        let moveCount = moveCount + 1;
+
+        return true;
+    }
+
+    /**
+     * Undoes the most recent move if history is not empty.
+     * Reverses player position, box movement, and decrements counters.
+     * Returns false if nothing to undo.
+     */
+    method boolean undo() {
+        var int oldPos, action, dir, boxPos, boxNewPos;
+        var boolean wasPush;
+        var int dx;
+        var int dy;
+
+        if (~history.pop()) {
+            return false;
+        }
+
+        // Get the popped move data
+        let oldPos = history.getPosition();
+        let action = history.getAction();
+
+        // Extract direction (low 2 bits)
+        let dir = action & 3;
+        let wasPush = ((action & 4) = 4);
+
+        // Reverse the move by calculating deltas
+        let dx = 0;
+        let dy = 0;
+        if (dir = 0) { let dx = -1; }  // was left, go right
+        if (dir = 1) { let dy = -1; }  // was up, go down
+        if (dir = 2) { let dx = 1; }   // was right, go left
+        if (dir = 3) { let dy = 1; }   // was down, go up
+
+        if (wasPush) {
+            // History stores the POST-move keeper position. The pushed box
+            // lies one step beyond it, and must return to that recorded cell.
+            let boxNewPos = oldPos + (dy * 20) + dx;
+            let boxPos = oldPos;
+
+            // Move box back
+            let boxes[boxNewPos] = false;
+            let boxes[boxPos] = true;
+
+            // Decrement push counter
+            let pushCount = pushCount - 1;
+        }
+
+        // Subtract the forward delta to recover the PRE-move position.
+        let playerPos = oldPos - (dy * 20) - dx;
+
+        // Decrement move counter
+        let moveCount = moveCount - 1;
+
+        return true;
+    }
+
+    /**
+     * Checks if the level is solved.
+     * All boxes must be on goal terrain (terrain code 3).
+     */
+    method boolean solved() {
+        var int i;
+        var int boxesOnGoals;
+
+        let boxesOnGoals = 0;
+        let i = 0;
+        while (i < 320) {
+            if (boxes[i]) {
+                // Box exists: check if it's on a goal
+                if (terrain[i] = 3) {
+                    let boxesOnGoals = boxesOnGoals + 1;
+                }
+            }
+            let i = i + 1;
+        }
+
+        // Solved if all boxes are on goals
+        return (boxesOnGoals = boxCount);
+    }
+
+    /**
+     * Loads a level by calling Levels.load(this, level).
+     * Clears board state first, then delegates to Levels.
+     * Clamps level to valid range 1..50.
+     */
+    method void load(int lvl) {
+        // Clamp level to 1..50
+        if (lvl < 1) {
+            let lvl = 1;
+        }
+        if (lvl > 50) {
+            let lvl = 50;
+        }
+
+        // Clear first: clear() resets level as well as arrays and counters.
+        do clear();
+        let level = lvl;
+
+        // Delegate to Levels to populate board
+        do Levels.load(this, lvl);
+
+        return;
+    }
+}

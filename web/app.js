@@ -1,6 +1,6 @@
 /** Composition root: local files → linker → WASM CPU → browser adapters.
- * The application includes a Jack OS library but no games. File.text() reads files
- * the user explicitly selected; no VM content is uploaded or fetched remotely.
+ * Sokoban is preloaded from same-origin static assets. File.text() reads custom
+ * programs explicitly selected by the user; local VM content is never uploaded.
  * A replacement is transactional: an invalid selection leaves the previous
  * program paused. The selection is retained so missing OS/classes can be added.
  */
@@ -68,7 +68,7 @@ function unique(files) {
   }
   return files;
 }
-async function local(event, append=false) {
+async function local(event, append=false, builtinName='') {
   const selected=[...event.target.files].filter(file=>/\.vm$/i.test(file.name));
   // Reset so choosing the same on-disk files after editing triggers change again.
   event.target.value='';
@@ -97,7 +97,9 @@ async function local(event, append=false) {
     player.onStatusChange=message=>{status(runtime.status===2 ? describe(2) : message);buttons();};
     $('source-file-select').replaceChildren(...files.map((file,i)=>new Option(file.name,i)));
     display.clear();display.render(runtime.ram);
-    const message=`Loaded ${selectedFiles.length} local VM file(s)${linked.builtinFiles.length ? ' + built-in Jack OS' : ''} — press Run, then use the focused screen.`;
+    const message=builtinName
+      ? `Ready — ${builtinName} loaded with built-in Jack OS. Press Run to play, or Choose your own program.`
+      : `Loaded ${selectedFiles.length} local VM file(s)${linked.builtinFiles.length ? ' + built-in Jack OS' : ''} — press Run, then use the focused screen.`;
     status(message);loadFeedback(message);refresh();
   } catch(error) {
     if(version!==loadVersion) return;
@@ -177,4 +179,15 @@ canvas.addEventListener('blur',()=>{keyboard.clearAll();runtime?.setKey(0);});
 window.addEventListener('blur',()=>{keyboard.clearAll();runtime?.setKey(0);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden) pause('Paused (tab hidden)');});
 buttons();
-status('Ready — choose local VM file(s) or a folder of VMs. Jack OS is built in; no games are bundled.');
+// Start the same transactional load immediately: a later local selection wins,
+// even if these fetches are still pending. The bundled program starts paused.
+function loadSokoban() {
+  const names=['Board','Draw','Game','History','Levels','Main','SaveCodec'];
+  return local({target:{value:'',files:names.map(name=>({name:`${name}.vm`,async text(){
+    const response=await fetch(new URL(`../games/sokoban/${name}.vm`,import.meta.url));
+    if(!response.ok) throw Error(`Sokoban ${name}.vm: HTTP ${response.status}`);
+    return response.text();
+  }}))}},false,'Sokoban');
+}
+$('load-sokoban').addEventListener('click',()=>loadSokoban());
+loadSokoban();

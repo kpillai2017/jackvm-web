@@ -1,0 +1,168 @@
+/** Monochrome view of the Default theme: riveted metal, cross-braced wood,
+ * dotted storage markers and a human keeper. Black is a SET bit in Hack VRAM.
+ * The original coloured PNGs are not embedded; these small masks are a new
+ * interpretation of their shapes. One tile occupies exactly one 16-bit word
+ * per scanline. Word alignment lets us paint without disturbing neighbours.
+ * Draw borrows Boards during calls; it owns only its seven-tile mask array.
+ */
+class Draw {
+    field Array masks;
+    field int originX, originY;
+
+    constructor Draw new() {
+        var int i;
+        let masks = Array.new(112);
+        let originX = 0; let originY = 0;
+        let i = 0;
+        while (i < 16) {
+            // Tile 0: black exterior; tile 2: pale warehouse floor.
+            let masks[i] = -1;
+            let masks[32+i] = 0;
+            // Tile 1: gray metal, with a dark inset outline.
+            if ((i = 0) | (i = 15)) { let masks[16+i] = -1; }
+            else {
+                if ((i = 1) | (i = 14)) { let masks[16+i] = -32767; }
+                else {
+                    if (((i / 2) * 2) = i) { let masks[16+i] = -21845; }
+                    else { let masks[16+i] = -10923; }
+                }
+            }
+            // Tiles 4/5: normal/goal crates. Pale frame, black inside,
+            // white diagonal braces; goal crates have inverted interiors.
+            let masks[64+i] = 0; let masks[80+i] = 0;
+            let masks[48+i] = 0; let masks[96+i] = 0;
+            let i = i + 1;
+        }
+        // Four white rivets interrupt the gray metal texture.
+        let masks[18] = -21973; let masks[19] = -11051;
+        let masks[28] = -21973; let masks[29] = -11051;
+        // Sparse floor grain (only two black pixels in a tile).
+        let masks[36] = 16; let masks[43] = 2048;
+        // A centered storage diamond, visible even without colour.
+        let masks[52] = 384; let masks[53] = 576;
+        let masks[54] = 1056; let masks[55] = 2064;
+        let masks[56] = 2064; let masks[57] = 1056;
+        let masks[58] = 576; let masks[59] = 384;
+        // Wood crate: outer frame, inner rectangle and diagonal X brace.
+        let masks[65] = 32766; let masks[66] = 16386;
+        let masks[67] = 24570; let masks[68] = 28662;
+        let masks[69] = 30702; let masks[70] = 31614;
+        let masks[71] = 32254; let masks[72] = 32254;
+        let masks[73] = 31614; let masks[74] = 30702;
+        let masks[75] = 28662; let masks[76] = 24570;
+        let masks[77] = 16386; let masks[78] = 32766;
+        let i = 1;
+        while (i < 15) {
+            // Invert only the inner 12 bits to signal a crate on storage.
+            let masks[80+i] = (masks[64+i] & -16381) | ((~masks[64+i]) & 16380);
+            let i = i + 1;
+        }
+        // Keeper: cap/head, arms, overalls, separated feet.
+        let masks[97] = 960; let masks[98] = 2016;
+        let masks[99] = 960; let masks[100] = 576;
+        let masks[101] = 960; let masks[102] = 2016;
+        let masks[103] = 4080; let masks[104] = 6104;
+        let masks[105] = 6104; let masks[106] = 2016;
+        let masks[107] = 2016; let masks[108] = 1632;
+        let masks[109] = 1632; let masks[110] = 3696;
+        return this;
+    }
+    method void dispose() {
+        do masks.dispose(); do Memory.deAlloc(this); return;
+    }
+    /** Takes ownership of a short literal; every UI allocation is disposed. */
+    function void text(int row, String s) {
+        do Output.moveCursor(row, 45); do Output.printString(s); do s.dispose();
+        return;
+    }
+    method void cell(Board board, int index) {
+        var int x, y, kind, row, address, word;
+        let y = index / 20; let x = index - (y * 20);
+        if ((index < 0) | (y > (board.getHeight()-1)) | (x > (board.getWidth()-1))) { return; }
+        let kind = board.terrainAt(index);
+        if (board.boxAt(index)) {
+            let kind = 4; if (board.terrainAt(index) = 3) { let kind = 5; }
+        }
+        if (index = board.getPlayer()) { let kind = 6; }
+        let address = 16384 + ((originY + (y*16))*32) + (originX/16) + x;
+        let row = 0;
+        while (row < 16) {
+            let word = masks[(kind*16)+row];
+            // Goal remains visible as black corner dots beneath the keeper.
+            if ((kind = 6) & (board.terrainAt(index) = 3)) {
+                if ((row = 2) | (row = 13)) { let word = word | 8196; }
+            }
+            do Memory.poke(address, word);
+            let address = address + 32; let row = row + 1;
+        }
+        return;
+    }
+    method void full(Board board, boolean saved, int message) {
+        var int x, y;
+        let originX = ((22-board.getWidth())/2)*16;
+        let originY = (16-board.getHeight())*8;
+        do Screen.clearScreen(); do Screen.setColor(true);
+        do Screen.drawRectangle(0, 0, 351, 255);
+        let y = 0;
+        while (y < board.getHeight()) {
+            let x = 0;
+            while (x < board.getWidth()) {
+                do cell(board, (y*20)+x); let x = x + 1;
+            }
+            let y = y + 1;
+        }
+        do Screen.drawLine(352, 0, 352, 255);
+        do Draw.text(0, "S O K O B A N");
+        do Draw.text(2, "Level:      / 50");
+        do Draw.text(3, "Moves:"); do Draw.text(4, "Pushes:");
+        do Draw.text(5, "Crates:");
+        do Draw.text(9, "Arrows : move");
+        do Draw.text(10, "W A D J: move");
+        do Draw.text(11, "U : undo (512)");
+        do Draw.text(12, "R : restart");
+        do Draw.text(13, "N/B : next/back");
+        do Draw.text(14, "S/L : save/load");
+        do Draw.text(15, "E : export code");
+        do Draw.text(16, "I : import code");
+        do Draw.text(17, "Q/Esc : quit");
+        do Draw.text(19, "Push, never pull.");
+        do Draw.text(20, "Fill every goal.");
+        do Draw.text(21, "Release each key.");
+        do Draw.text(22, "J = down, S=save");
+        do status(board, saved, message); return;
+    }
+    method void status(Board board, boolean saved, int message) {
+        do Draw.text(2, "Level:      / 50");
+        do Output.moveCursor(2, 52); do Output.printInt(board.getLevel());
+        do Draw.text(3, "Moves:            ");
+        do Output.moveCursor(3, 52); do Output.printInt(board.getMoves());
+        do Draw.text(4, "Pushes:           ");
+        do Output.moveCursor(4, 52); do Output.printInt(board.getPushes());
+        do Draw.text(5, "Crates:           ");
+        do Output.moveCursor(5, 52); do Output.printInt(board.getBoxCount());
+        do Draw.text(6, "                  ");
+        if (saved) { do Draw.text(6, "RAM save: yes"); }
+        else { do Draw.text(6, "RAM save: empty"); }
+        do Draw.text(7, "                  ");
+        if (board.solved()) { do Draw.text(7, "SOLVED! N: next"); }
+        do Draw.text(8, "                  ");
+        if (message = 1) { do Draw.text(8, "Saved in RAM"); }
+        if (message = 2) { do Draw.text(8, "Restored"); }
+        if (message = 3) { do Draw.text(8, "No saved game"); }
+        if (message = 4) { do Draw.text(8, "Invalid/cancelled"); }
+        if (message = 5) { do Draw.text(8, "Move limit: undo"); }
+        if (message = 6) { do Draw.text(8, "Nothing to undo"); }
+        return;
+    }
+    /** A push/undo affects old keeper, new keeper and one box neighbour.
+     * Repainting all four neighbours is cheap and avoids coupling to rules. */
+    method void changed(Board board, int oldPlayer, int newPlayer) {
+        do cell(board, oldPlayer); do cell(board, newPlayer);
+        do cell(board, newPlayer-1); do cell(board, newPlayer+1);
+        do cell(board, newPlayer-20); do cell(board, newPlayer+20);
+        // Undoing a push leaves the former box destination beyond OLD keeper.
+        do cell(board, oldPlayer-1); do cell(board, oldPlayer+1);
+        do cell(board, oldPlayer-20); do cell(board, oldPlayer+20);
+        return;
+    }
+}

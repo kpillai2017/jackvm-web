@@ -3,8 +3,10 @@
 This project teaches a VM interpreter and browser runtime for the Hack CPU.
 Read ARCHITECTURE.md alongside the source. The CPU's comments explain invariants;
 the browser modules explain the boundary between machine state and presentation.
-The built-in Jack OS is automatically linked; exercises can use it or remain OS-free.
-All examples use VM programs you supply through the file picker or write locally.
+The built-in Jack OS is automatically linked; Sokoban is bundled and preloaded at
+startup (paused). Exercises can use the bundled game, load custom games, or remain
+OS-free. All examples use VM programs you supply through the file picker, load via
+the **Load Sokoban** button, or write locally.
 
 ## Lesson 1 — the stack
 

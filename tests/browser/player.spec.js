@@ -108,16 +108,20 @@ test('empty/non-VM selection gives feedback and does not erase loaded program',a
   await expect(status(page)).toContainText('No .vm files selected');
   await expect(page.locator('#run-btn')).toBeEnabled();
 });
-test('application needs no manifests and makes no VM uploads or game fetches',async({page})=>{
+test('only bundled Sokoban is fetched and local programs are never uploaded',async({page})=>{
   const requests=[];page.on('request',request=>requests.push({url:request.url(),method:request.method()}));
   await load(page);
   expect(requests.filter(r=>r.method!=='GET')).toEqual([]);
-  expect(requests.some(r=>/\.(vm|json)(\?|$)/.test(r.url))).toBe(false);
+  expect(requests.filter(r=>/\.(vm|json)(\?|$)/.test(r.url)).every(r=>r.url.includes('/games/sokoban/'))).toBe(true);
   expect(requests.some(r=>r.url.endsWith('/web/runtime.wasm'))).toBe(true);
 });
-test('static output has no VM assets or game directories; server handles URLs',async({request})=>{
+test('static output includes Sokoban and corresponding source; server handles URLs',async({request})=>{
   const names=await readdir(new URL('../../dist/',import.meta.url));
-  for(const forbidden of ['games','os','examples']) expect(names).not.toContain(forbidden);
+  for(const forbidden of ['os','examples']) expect(names).not.toContain(forbidden);
+  expect(names).toContain('games');expect(names).toContain('corresponding-source');
+  expect((await request.get('/games/sokoban/Main.vm')).status()).toBe(200);
+  expect((await request.get('/corresponding-source/sokoban/Main.jack')).status()).toBe(200);
+  expect((await request.get('/corresponding-source/sokoban/LICENSE')).status()).toBe(200);
   for(const url of ['/games/manifest.json','/os/manifest.json','/examples/demo/Main.vm'])
     expect((await request.get(url)).status()).toBe(404);
   expect((await request.get('/?cache=1')).status()).toBe(200);

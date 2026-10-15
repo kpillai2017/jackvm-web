@@ -1,0 +1,110 @@
+// History.jack
+// Manages a bounded ring buffer of move history for undo functionality.
+// Stores up to 512 moves with position and action (direction + push flag).
+// When full, oldest entries are evicted.
+
+class History {
+
+    // Array of positions: each position is 0..319 (20*16 grid flattened)
+    field Array positions;
+
+    // Array of actions: direction encoded in low 2 bits (0=left, 1=up, 2=right, 3=down)
+    // Bit 2 (value 4) set indicates a push occurred
+    // Encoding: (0..3) = direction, add 4 if pushed
+    field Array actions;
+
+    // Current write index: increments on each push, wraps at MAX_HISTORY
+    field int writeIndex;
+
+    // Current count: number of valid entries, capped at MAX_HISTORY
+    field int count;
+
+    /** Creates a new empty history buffer. */
+    constructor History new() {
+        let positions = Array.new(512);
+        let actions = Array.new(512);
+        let writeIndex = 0;
+        let count = 0;
+
+        return this;
+    }
+
+    /** Disposes of the history buffer and its arrays. */
+    method void dispose() {
+        do positions.dispose();
+        do actions.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Clears all history: resets count and write index. No deallocation. */
+    method void clear() {
+        let writeIndex = 0;
+        let count = 0;
+        return;
+    }
+
+    /**
+     * Pushes a move onto the history buffer.
+     * position: player position after move (0..319)
+     * action: direction (0=left, 1=up, 2=right, 3=down) + 4 if box was pushed
+     * If buffer is full, the oldest entry is silently evicted.
+     */
+    method void push(int position, int action) {
+        // Store the move at current write index
+        let positions[writeIndex] = position;
+        let actions[writeIndex] = action;
+
+        // Advance write index with wrap-around
+        if ((writeIndex + 1) = 512) {
+            let writeIndex = 0;
+        } else {
+            let writeIndex = writeIndex + 1;
+        }
+
+        // Increment count up to 512
+        if (count < 512) {
+            let count = count + 1;
+        }
+
+        return;
+    }
+
+    /**
+     * Pops the most recent move from history.
+     * Returns false if history is empty, true on success.
+     * Updates write index to point to the popped entry.
+     */
+    method boolean pop() {
+        if (count = 0) {
+            return false;
+        }
+
+        // Move write index back (with wrap-around for ring buffer)
+        if (writeIndex = 0) {
+            let writeIndex = 511;
+        } else {
+            let writeIndex = writeIndex - 1;
+        }
+        let count = count - 1;
+
+        return true;
+    }
+
+    /**
+     * Returns the position of the most recent move.
+     * Assumes pop() was just called, so write index points to that entry.
+     */
+    method int getPosition() {
+        return positions[writeIndex];
+    }
+
+    /**
+     * Returns the action of the most recent move.
+     * Assumes pop() was just called, so write index points to that entry.
+     * Direction: 0=left, 1=up, 2=right, 3=down. Add 4 if pushed.
+     */
+    method int getAction() {
+        return actions[writeIndex];
+    }
+}

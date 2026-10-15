@@ -3,10 +3,21 @@
 A modular browser-only interpreter for standard nand2tetris Jack VM code. The
 CPU is **AssemblyScript compiled to WebAssembly**; JavaScript handles parsing,
 linking, local file selection, scheduling, keyboard input and the canvas.
-A **built-in Jack OS is automatically embedded** via `web/builtin-os.js`; you select
-your game folder and press Run. No games, game folders, or sibling VM repositories
-are needed. The embedded OS provides standard Jack libraries (Memory, Math, Screen,
-Output, Keyboard and others); user programs win where they supply their own classes.
+A **built-in Jack OS is automatically embedded** via `web/builtin-os.js`, and
+**Sokoban is bundled and preloaded at startup, paused**. Press **Run** to begin;
+click **Load Sokoban** to restore the bundled game. Click **Choose** to load custom
+local files privately (no upload). The embedded OS provides standard Jack libraries
+(Memory, Math, Screen, Output, Keyboard and others); user programs win where they
+supply their own classes.
+
+![Sokoban running in the WASM player](docs/images/sokoban.png)
+
+**Sokoban controls:** click the game screen, then use the arrow keys to move,
+**U** to undo, **R** to restart, and **N / B** for the next/previous level.
+Push crates onto every goal; crates cannot be pulled. Release each key before
+pressing it again. The game includes 50 levels; see its on-screen help and
+[matching source and study notes](corresponding-source/sokoban/BUILD.md).
+The screenshot above was captured from the actual WASM player, not a mock-up.
 
 ## How to run the WASM browser program
 
@@ -16,23 +27,25 @@ Open **https://kpillai2017.github.io/jackvm-web/** after the GitHub Pages
 workflow succeeds. Source repository: https://github.com/kpillai2017/jackvm-web .
 The GitHub file-view page is not the application: use the Pages website URL.
 Visitors need only a modern WebAssembly-capable browser—no Node.js, terminal,
-plugin, Jack compiler, or local server.
+plugin, Jack compiler, or local server. Sokoban loads automatically and starts paused.
 
-1. Click **Choose** next to **VM files or a folder of VMs**, then select
+1. Press **Run** to start Sokoban, or click **Load Sokoban** to restore it after
+   loading custom files.
+2. Click **Choose** next to **VM files or a folder of VMs**, then select
    **VM files** or **Folder of VMs** in the dialog. The browser opens the matching
    local picker. Folder selection includes VM files in subdirectories; non-VM
-   files are ignored. Native “No file chosen” fields are hidden; selected program
-   filenames appear in the application’s file list instead.
-2. Wait for **Loaded**. The built-in Jack OS classes are automatically linked if
+   files are ignored. Native "No file chosen" fields are hidden; selected program
+   filenames appear in the application's file list instead.
+3. Wait for **Loaded**. The built-in Jack OS classes are automatically linked if
    your game does not provide its own versions (e.g., if your game has its own
    Memory.vm, that wins; otherwise the built-in is used).
-3. Click **Run**, then click the display if necessary to focus keyboard input.
-4. Optional: expand **extra classes or custom OS overrides**, then use its
+4. Click **Run**, then click the display if necessary to focus keyboard input.
+5. Optional: expand **extra classes or custom OS overrides**, then use its
    **Choose** button to add VM files or a folder. These merge with the selected
    program rather than replacing it. Custom OS functions take precedence.
-5. Use **Pause**, **Step**, **Reset**, the speed slider and RAM inspector in the
+6. Use **Pause**, **Step**, **Reset**, the speed slider and RAM inspector in the
    **right sidebar**. The game screen fills the main workspace by default.
-6. Click **Show source** above the game to open the VM source panel and shrink
+7. Click **Show source** above the game to open the VM source panel and shrink
    the game into a split view. **Hide source** restores the large game view.
    Changing views does not reset or pause execution. On narrow screens the
    panels stack vertically rather than squeeze into unreadable columns.
@@ -77,7 +90,8 @@ npm run serve
 ```
 
 For a standalone clone of this repository, start in its root and omit
-`cd jackvm-web`. Open **http://127.0.0.1:3000**, then choose local files as above.
+`cd jackvm-web`. Open **http://127.0.0.1:3000**, where Sokoban loads automatically and
+starts paused. Press **Run** to start it. You can then choose local files as above.
 Keep the terminal open; **Ctrl+C** stops the server. Rebuild and refresh after
 source changes: the server does not rebuild automatically.
 
@@ -126,13 +140,16 @@ In **Settings → Pages**, set **Source → GitHub Actions**. The supplied
 manual dispatch. Wait for a successful deployment, then open the URL shown by
 GitHub. Relative asset URLs support project sites under `/<repository>/`.
 
-The deployed output contains only the application, WASM, embedded built-in OS
-bytecode, documentation and license. It has no games, examples folders, manifests
-or downloadable `.vm` game assets. There are no private-game build modes or import
-tools. The OS is part of the player and is linked automatically. No sibling repositories are needed. Users may select
-their own game programs from the hosted site without uploading those programs to
-GitHub. Respect the licenses of programs you load or distribute separately; see
-[Attribution](docs/ATTRIBUTION.md).
+The deployed output contains the application, WASM, embedded built-in OS bytecode,
+Sokoban (bundled and paused at startup), documentation and license. Only Sokoban
+is bundled; no other games, examples folders or manifests are included. Its
+seven `.vm` files are served from `games/sokoban/`, with matching Jack source,
+level data, build tools and GPL-2.0 license in
+[`corresponding-source/sokoban/`](corresponding-source/sokoban/). There are no private-game build modes or import tools. The OS
+is part of the player and is linked automatically. No sibling repositories are needed.
+Users may select their own additional game programs from the hosted site without
+uploading those programs to GitHub. Respect the licenses of programs you load or
+distribute separately; see [Attribution](docs/ATTRIBUTION.md).
 
 ## Visual design
 
@@ -172,7 +189,9 @@ There is no audio, Jack compilation, save-state system or touch controller.
 | `web/player.js` | Bounded browser-frame scheduling and input sampling |
 | `web/display.js` | Hack screen RAM → 512×256 canvas |
 | `web/keyboard.js` | Focus-aware keys → keyboard register |
-| `tools/` | Application-only packaging and loopback static server |
+| `games/sokoban/` | Seven bundled Sokoban VM classes |
+| `corresponding-source/sokoban/` | Matching GPL-2.0 source, levels and build tools |
+| `tools/` | Player/game/source packaging and loopback static server |
 | `tests/` | CPU tests and browser file/folder loading checks |
 
 ## Verification and further reading
@@ -183,7 +202,8 @@ npx playwright install chromium  # one-time browser setup
 npm run test:browser
 ```
 
-Tests use inline synthetic VM inputs, not bundled games or sibling repositories.
+Tests cover the bundled Sokoban preload and inline synthetic VM inputs; they
+need no sibling repositories.
 Browser folder fixtures are temporary workspace files removed after each test.
 See [Verification](docs/VERIFICATION.md) for results and limits,
 [Architecture](docs/ARCHITECTURE.md) for component design and the WASM ABI, and

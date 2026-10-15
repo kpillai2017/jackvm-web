@@ -1,0 +1,574 @@
+function SaveCodec.digit 0
+    push argument 0
+    push constant 47
+    gt
+    push argument 0
+    push constant 58
+    lt
+    and
+    not
+    if-goto ELSE$1
+    push argument 0
+    push constant 48
+    sub
+    return
+    goto ENDIF$2
+label ELSE$1
+label ENDIF$2
+    push argument 0
+    push constant 64
+    gt
+    push argument 0
+    push constant 71
+    lt
+    and
+    not
+    if-goto ELSE$4
+    push argument 0
+    push constant 55
+    sub
+    return
+    goto ENDIF$5
+label ELSE$4
+label ENDIF$5
+    push argument 0
+    push constant 96
+    gt
+    push argument 0
+    push constant 103
+    lt
+    and
+    not
+    if-goto ELSE$7
+    push argument 0
+    push constant 87
+    sub
+    return
+    goto ENDIF$8
+label ELSE$7
+label ENDIF$8
+    push constant 1
+    neg
+    return
+function SaveCodec.put 3
+    push constant 1
+    pop local 0
+    push constant 1
+    pop local 1
+label WHILE$9
+    push local 1
+    push argument 2
+    lt
+    not
+    if-goto ENDWHILE$10
+    push local 0
+    push constant 16
+    call Math.multiply 2
+    pop local 0
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$9
+label ENDWHILE$10
+label WHILE$11
+    push argument 2
+    push constant 0
+    gt
+    not
+    if-goto ENDWHILE$12
+    push argument 1
+    push local 0
+    call Math.divide 2
+    pop local 2
+    push local 2
+    push constant 10
+    lt
+    not
+    if-goto ELSE$14
+    push argument 0
+    push constant 48
+    push local 2
+    add
+    call String.appendChar 2
+    pop temp 0
+    goto ENDIF$15
+label ELSE$14
+    push argument 0
+    push constant 55
+    push local 2
+    add
+    call String.appendChar 2
+    pop temp 0
+label ENDIF$15
+    push argument 1
+    push local 2
+    push local 0
+    call Math.multiply 2
+    sub
+    pop argument 1
+    push local 0
+    push constant 16
+    call Math.divide 2
+    pop local 0
+    push argument 2
+    push constant 1
+    sub
+    pop argument 2
+    goto WHILE$11
+label ENDWHILE$12
+    push constant 0
+    return
+function SaveCodec.get 2
+    push constant 0
+    pop local 0
+    push constant 0
+    pop local 1
+label WHILE$16
+    push local 1
+    push argument 2
+    lt
+    not
+    if-goto ENDWHILE$17
+    push local 0
+    push constant 16
+    call Math.multiply 2
+    push argument 0
+    push argument 1
+    push local 1
+    add
+    call String.charAt 2
+    call SaveCodec.digit 1
+    add
+    pop local 0
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$16
+label ENDWHILE$17
+    push local 0
+    return
+function SaveCodec.checksum 2
+    push constant 0
+    pop local 0
+    push constant 0
+    pop local 1
+label WHILE$18
+    push local 1
+    push argument 1
+    lt
+    not
+    if-goto ENDWHILE$19
+    push local 0
+    push argument 0
+    push local 1
+    call String.charAt 2
+    call SaveCodec.digit 1
+    add
+    push local 1
+    add
+    pop local 0
+    push local 0
+    push constant 4092
+    gt
+    not
+    if-goto ELSE$21
+    push local 0
+    push constant 4093
+    sub
+    pop local 0
+    goto ENDIF$22
+label ELSE$21
+label ENDIF$22
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$18
+label ENDWHILE$19
+    push local 0
+    return
+function SaveCodec.encode 2
+    push constant 160
+    call String.new 1
+    pop local 0
+    push local 0
+    push constant 49
+    call String.appendChar 2
+    pop temp 0
+    push local 0
+    push argument 0
+    call Board.getLevel 1
+    push constant 2
+    call SaveCodec.put 3
+    pop temp 0
+    push local 0
+    push argument 0
+    call Board.getMoves 1
+    push constant 4
+    call SaveCodec.put 3
+    pop temp 0
+    push local 0
+    push argument 0
+    call Board.getPushes 1
+    push constant 4
+    call SaveCodec.put 3
+    pop temp 0
+    push local 0
+    push argument 0
+    call Board.getPlayer 1
+    push constant 3
+    call SaveCodec.put 3
+    pop temp 0
+    push constant 0
+    pop local 1
+label WHILE$23
+    push local 1
+    push constant 320
+    lt
+    not
+    if-goto ENDWHILE$24
+    push argument 0
+    push local 1
+    call Board.boxAt 2
+    not
+    if-goto ELSE$26
+    push local 0
+    push local 1
+    push constant 3
+    call SaveCodec.put 3
+    pop temp 0
+    goto ENDIF$27
+label ELSE$26
+label ENDIF$27
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$23
+label ENDWHILE$24
+    push local 0
+    push local 0
+    push local 0
+    call String.length 1
+    call SaveCodec.checksum 2
+    push constant 3
+    call SaveCodec.put 3
+    pop temp 0
+    push local 0
+    return
+function SaveCodec.copy 1
+    push argument 1
+    push argument 0
+    call Board.getLevel 1
+    call Board.load 2
+    pop temp 0
+    push constant 0
+    pop local 0
+label WHILE$28
+    push local 0
+    push constant 320
+    lt
+    not
+    if-goto ENDWHILE$29
+    push argument 1
+    push local 0
+    push argument 0
+    push local 0
+    call Board.boxAt 2
+    call Board.setBox 3
+    pop temp 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto WHILE$28
+label ENDWHILE$29
+    push argument 1
+    push argument 0
+    call Board.getPlayer 1
+    call Board.setPlayer 2
+    pop temp 0
+    push argument 1
+    push argument 0
+    call Board.getMoves 1
+    push argument 0
+    call Board.getPushes 1
+    call Board.setCounters 3
+    pop temp 0
+    push argument 1
+    call Board.clearHistory 1
+    pop temp 0
+    push constant 0
+    return
+function SaveCodec.decode 11
+    push argument 0
+    call String.length 1
+    pop local 0
+    push local 0
+    push constant 20
+    lt
+    push local 0
+    push constant 119
+    gt
+    or
+    not
+    if-goto ELSE$31
+    push constant 0
+    return
+    goto ENDIF$32
+label ELSE$31
+label ENDIF$32
+    push constant 0
+    pop local 1
+label WHILE$33
+    push local 1
+    push local 0
+    lt
+    not
+    if-goto ENDWHILE$34
+    push argument 0
+    push local 1
+    call String.charAt 2
+    call SaveCodec.digit 1
+    push constant 0
+    lt
+    not
+    if-goto ELSE$36
+    push constant 0
+    return
+    goto ENDIF$37
+label ELSE$36
+label ENDIF$37
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$33
+label ENDWHILE$34
+    push argument 0
+    push constant 0
+    call String.charAt 2
+    push constant 49
+    eq
+    not
+    not
+    if-goto ELSE$39
+    push constant 0
+    return
+    goto ENDIF$40
+label ELSE$39
+label ENDIF$40
+    push argument 0
+    push constant 3
+    call String.charAt 2
+    call SaveCodec.digit 1
+    push constant 7
+    gt
+    push argument 0
+    push constant 7
+    call String.charAt 2
+    call SaveCodec.digit 1
+    push constant 7
+    gt
+    or
+    not
+    if-goto ELSE$42
+    push constant 0
+    return
+    goto ENDIF$43
+label ELSE$42
+label ENDIF$43
+    push argument 0
+    push local 0
+    push constant 3
+    sub
+    push constant 3
+    call SaveCodec.get 3
+    push argument 0
+    push local 0
+    push constant 3
+    sub
+    call SaveCodec.checksum 2
+    eq
+    not
+    not
+    if-goto ELSE$45
+    push constant 0
+    return
+    goto ENDIF$46
+label ELSE$45
+label ENDIF$46
+    push argument 0
+    push constant 1
+    push constant 2
+    call SaveCodec.get 3
+    pop local 2
+    push local 2
+    push constant 1
+    lt
+    push local 2
+    push constant 50
+    gt
+    or
+    not
+    if-goto ELSE$48
+    push constant 0
+    return
+    goto ENDIF$49
+label ELSE$48
+label ENDIF$49
+    push argument 0
+    push constant 3
+    push constant 4
+    call SaveCodec.get 3
+    pop local 3
+    push argument 0
+    push constant 7
+    push constant 4
+    call SaveCodec.get 3
+    pop local 4
+    push local 4
+    push local 3
+    gt
+    not
+    if-goto ELSE$51
+    push constant 0
+    return
+    goto ENDIF$52
+label ELSE$51
+label ENDIF$52
+    call Board.new 0
+    pop local 9
+    push local 9
+    push local 2
+    call Board.load 2
+    pop temp 0
+    push local 9
+    call Board.getBoxCount 1
+    pop local 8
+    push local 0
+    push constant 17
+    push local 8
+    push constant 3
+    call Math.multiply 2
+    add
+    eq
+    pop local 10
+    push argument 0
+    push constant 11
+    push constant 3
+    call SaveCodec.get 3
+    pop local 5
+    push local 9
+    push local 5
+    call Board.terrainAt 2
+    push constant 2
+    lt
+    not
+    if-goto ELSE$54
+    push constant 0
+    pop local 10
+    goto ENDIF$55
+label ELSE$54
+label ENDIF$55
+    push constant 0
+    pop local 1
+label WHILE$56
+    push local 1
+    push constant 320
+    lt
+    not
+    if-goto ENDWHILE$57
+    push local 9
+    push local 1
+    push constant 0
+    call Board.setBox 3
+    pop temp 0
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$56
+label ENDWHILE$57
+    push constant 14
+    pop local 1
+    push constant 1
+    neg
+    pop local 7
+label WHILE$58
+    push local 1
+    push local 0
+    push constant 3
+    sub
+    lt
+    push local 10
+    and
+    not
+    if-goto ENDWHILE$59
+    push argument 0
+    push local 1
+    push constant 3
+    call SaveCodec.get 3
+    pop local 6
+    push local 6
+    push local 7
+    push constant 1
+    add
+    lt
+    push local 9
+    push local 6
+    call Board.terrainAt 2
+    push constant 2
+    lt
+    or
+    push local 6
+    push local 5
+    eq
+    or
+    not
+    if-goto ELSE$61
+    push constant 0
+    pop local 10
+    goto ENDIF$62
+label ELSE$61
+    push local 9
+    push local 6
+    push constant 1
+    neg
+    call Board.setBox 3
+    pop temp 0
+label ENDIF$62
+    push local 6
+    pop local 7
+    push local 1
+    push constant 3
+    add
+    pop local 1
+    goto WHILE$58
+label ENDWHILE$59
+    push local 10
+    not
+    if-goto ELSE$64
+    push local 9
+    push local 5
+    call Board.setPlayer 2
+    pop temp 0
+    push local 9
+    push local 3
+    push local 4
+    call Board.setCounters 3
+    pop temp 0
+    push local 9
+    push argument 1
+    call SaveCodec.copy 2
+    pop temp 0
+    goto ENDIF$65
+label ELSE$64
+label ENDIF$65
+    push local 9
+    call Board.dispose 1
+    pop temp 0
+    push local 10
+    return

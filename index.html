@@ -21,7 +21,7 @@
     <section class="workspace" aria-label="Game and program workspace">
       <section class="panel-section program-panel" aria-labelledby="program-heading">
         <h2 id="program-heading">Select Program</h2>
-        <p class="status-message">Choose your program, then press Run. Jack OS is built in; files stay on your device.</p>
+        <p class="status-message">Sokoban is ready to play. Press Run, or choose your own VM program. Jack OS is built in.</p>
         <div class="choose-row">
           <span id="program-choice-label">VM files or a folder of VMs</span>
           <button id="program-choose" class="btn" type="button" aria-describedby="program-choice-label" aria-haspopup="dialog">Choose</button>
@@ -30,6 +30,7 @@
              filename boxes. One public button routes to either browser picker. -->
         <input type="file" id="local-folder" webkitdirectory multiple accept=".vm" hidden>
         <input type="file" id="local-files" multiple accept=".vm" hidden>
+        <button id="load-sokoban" class="btn btn-small" type="button">Load Sokoban</button>
         <details class="extra-files">
           <summary>Optional: extra classes or custom OS overrides</summary>
           <div class="choose-row">

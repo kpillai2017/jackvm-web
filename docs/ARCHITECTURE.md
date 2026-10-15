@@ -164,9 +164,11 @@ pause. No scheduler can guarantee exact game speed across machines.
 
 ## 6. Loading and distribution
 
-Users load their own game `.vm` files through the browser's file picker. The app
-accepts a directory containing a complete game VM set. The linker automatically
-merges user-supplied files with the embedded Jack OS library (15 standard classes
+Sokoban is bundled and preloaded at startup, paused. Users can press **Run** to play
+it, or click **Load Sokoban** to restore it after loading custom files. Additional
+game `.vm` files are loaded through the browser's file picker. The app accepts a
+directory containing a complete game VM set. The linker automatically merges
+user-supplied files with the embedded Jack OS library (15 standard classes
 from `web/builtin-os.js`); missing OS functions are filled transparently. User
 definitions always take precedence.
 File names must be unique within the selected set; only one program loads at a time.
@@ -175,9 +177,11 @@ previous paused program. A version token makes stale asynchronous requests harml
 
 `tools/package.mjs` whitelists public assets and cleans dist before each build.
 The build ships the interpreter, WASM module, embedded Jack OS bytecode in
-`web/builtin-os.js`, and documentation—no bundled games or import scripts.
+`web/builtin-os.js`, Sokoban bundled (seven VM files, matching source in
+corresponding-source/sokoban with GPL LICENSE), and documentation.
 The embedded OS is generated once via `tools/embed-os.mjs` (reading 15 `.vm`
 classes from `jackos/src`) and checked in; normal builds use the generated module.
+Sokoban source availability for GPL compliance is shipped in `corresponding-source/sokoban`.
+See ATTRIBUTION.md, SOKOBAN_LICENSE.txt and SOKOBAN_PROVENANCE.md for licensing context.
 All files stay in the browser; there is no upload endpoint. File reading uses the
-browser's native picker, not unrestricted disk access. See ATTRIBUTION.md and
-OS_PROVENANCE.md for licensing context.
+browser's native picker, not unrestricted disk access.

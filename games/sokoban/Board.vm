@@ -1,0 +1,909 @@
+function Board.new 0
+    push constant 10
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 320
+    call Array.new 1
+    pop this 0
+    push constant 320
+    call Array.new 1
+    pop this 1
+    call History.new 0
+    pop this 8
+    push constant 0
+    pop this 2
+    push constant 0
+    pop this 3
+    push constant 0
+    pop this 4
+    push constant 0
+    pop this 5
+    push constant 0
+    pop this 6
+    push constant 0
+    pop this 7
+    push constant 0
+    pop this 9
+    push pointer 0
+    return
+function Board.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Array.dispose 1
+    pop temp 0
+    push this 1
+    call Array.dispose 1
+    pop temp 0
+    push this 8
+    call History.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Board.clear 1
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 0
+label WHILE$0
+    push local 0
+    push constant 320
+    lt
+    not
+    if-goto ENDWHILE$1
+    push local 0
+    push this 0
+    add
+    push constant 0
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 0
+    push this 1
+    add
+    push constant 0
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto WHILE$0
+label ENDWHILE$1
+    push constant 0
+    pop this 2
+    push constant 0
+    pop this 3
+    push constant 0
+    pop this 4
+    push constant 0
+    pop this 5
+    push constant 0
+    pop this 6
+    push constant 0
+    pop this 7
+    push constant 0
+    pop this 9
+    push this 8
+    call History.clear 1
+    pop temp 0
+    push constant 0
+    return
+function Board.setSize 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    pop this 2
+    push argument 2
+    pop this 3
+    push constant 0
+    return
+function Board.row 5
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 0
+label WHILE$2
+    push local 0
+    push argument 1
+    call String.length 1
+    lt
+    not
+    if-goto ENDWHILE$3
+    push argument 2
+    push constant 20
+    call Math.multiply 2
+    push local 0
+    add
+    pop local 1
+    push argument 1
+    push local 0
+    call String.charAt 2
+    pop local 2
+    push constant 0
+    pop local 3
+    push constant 0
+    pop local 4
+    push local 2
+    push constant 45
+    eq
+    not
+    if-goto ELSE$5
+    push constant 0
+    pop local 3
+    goto ENDIF$6
+label ELSE$5
+label ENDIF$6
+    push local 2
+    push constant 35
+    eq
+    not
+    if-goto ELSE$8
+    push constant 1
+    pop local 3
+    goto ENDIF$9
+label ELSE$8
+label ENDIF$9
+    push local 2
+    push constant 32
+    eq
+    not
+    if-goto ELSE$11
+    push constant 2
+    pop local 3
+    goto ENDIF$12
+label ELSE$11
+label ENDIF$12
+    push local 2
+    push constant 46
+    eq
+    not
+    if-goto ELSE$14
+    push constant 3
+    pop local 3
+    goto ENDIF$15
+label ELSE$14
+label ENDIF$15
+    push local 2
+    push constant 36
+    eq
+    not
+    if-goto ELSE$17
+    push constant 2
+    pop local 3
+    push constant 1
+    neg
+    pop local 4
+    goto ENDIF$18
+label ELSE$17
+label ENDIF$18
+    push local 2
+    push constant 42
+    eq
+    not
+    if-goto ELSE$20
+    push constant 3
+    pop local 3
+    push constant 1
+    neg
+    pop local 4
+    goto ENDIF$21
+label ELSE$20
+label ENDIF$21
+    push local 2
+    push constant 64
+    eq
+    not
+    if-goto ELSE$23
+    push constant 2
+    pop local 3
+    push local 1
+    pop this 4
+    goto ENDIF$24
+label ELSE$23
+label ENDIF$24
+    push local 2
+    push constant 43
+    eq
+    not
+    if-goto ELSE$26
+    push constant 3
+    pop local 3
+    push local 1
+    pop this 4
+    goto ENDIF$27
+label ELSE$26
+label ENDIF$27
+    push local 1
+    push this 0
+    add
+    push local 3
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 4
+    not
+    if-goto ELSE$29
+    push local 1
+    push this 1
+    add
+    push constant 1
+    neg
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push this 9
+    push constant 1
+    add
+    pop this 9
+    goto ENDIF$30
+label ELSE$29
+    push local 1
+    push this 1
+    add
+    push constant 0
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+label ENDIF$30
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto WHILE$2
+label ENDWHILE$3
+    push argument 1
+    call String.dispose 1
+    pop temp 0
+    push constant 0
+    return
+function Board.getWidth 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    return
+function Board.getHeight 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    return
+function Board.getLevel 0
+    push argument 0
+    pop pointer 0
+    push this 5
+    return
+function Board.getPlayer 0
+    push argument 0
+    pop pointer 0
+    push this 4
+    return
+function Board.getMoves 0
+    push argument 0
+    pop pointer 0
+    push this 6
+    return
+function Board.getPushes 0
+    push argument 0
+    pop pointer 0
+    push this 7
+    return
+function Board.getBoxCount 0
+    push argument 0
+    pop pointer 0
+    push this 9
+    return
+function Board.terrainAt 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push constant 0
+    lt
+    push argument 1
+    push constant 319
+    gt
+    or
+    not
+    if-goto ELSE$32
+    push constant 0
+    return
+    goto ENDIF$33
+label ELSE$32
+label ENDIF$33
+    push this 0
+    push argument 1
+    add
+    pop pointer 1
+    push that 0
+    return
+function Board.boxAt 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push constant 0
+    lt
+    push argument 1
+    push constant 319
+    gt
+    or
+    not
+    if-goto ELSE$35
+    push constant 0
+    return
+    goto ENDIF$36
+label ELSE$35
+label ENDIF$36
+    push this 1
+    push argument 1
+    add
+    pop pointer 1
+    push that 0
+    return
+function Board.setBox 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push this 1
+    add
+    push argument 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 0
+    return
+function Board.setPlayer 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    pop this 4
+    push constant 0
+    return
+function Board.setCounters 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    pop this 6
+    push argument 2
+    pop this 7
+    push constant 0
+    return
+function Board.clearHistory 0
+    push argument 0
+    pop pointer 0
+    push this 8
+    call History.clear 1
+    pop temp 0
+    push constant 0
+    return
+function Board.move 7
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push constant 1
+    neg
+    eq
+    push argument 2
+    push constant 0
+    eq
+    and
+    push argument 1
+    push constant 1
+    eq
+    push argument 2
+    push constant 0
+    eq
+    and
+    or
+    push argument 1
+    push constant 0
+    eq
+    push argument 2
+    push constant 1
+    neg
+    eq
+    and
+    or
+    push argument 1
+    push constant 0
+    eq
+    push argument 2
+    push constant 1
+    eq
+    and
+    or
+    not
+    not
+    if-goto ELSE$38
+    push constant 0
+    return
+    goto ENDIF$39
+label ELSE$38
+label ENDIF$39
+    push argument 1
+    push constant 1
+    neg
+    eq
+    push this 4
+    push this 4
+    push constant 20
+    call Math.divide 2
+    push constant 20
+    call Math.multiply 2
+    sub
+    push constant 0
+    eq
+    and
+    not
+    if-goto ELSE$41
+    push constant 0
+    return
+    goto ENDIF$42
+label ELSE$41
+label ENDIF$42
+    push argument 1
+    push constant 1
+    eq
+    push this 4
+    push this 4
+    push constant 20
+    call Math.divide 2
+    push constant 20
+    call Math.multiply 2
+    sub
+    push constant 19
+    eq
+    and
+    not
+    if-goto ELSE$44
+    push constant 0
+    return
+    goto ENDIF$45
+label ELSE$44
+label ENDIF$45
+    push this 6
+    push constant 32767
+    eq
+    not
+    if-goto ELSE$47
+    push constant 0
+    return
+    goto ENDIF$48
+label ELSE$47
+label ENDIF$48
+    push this 4
+    push argument 2
+    push constant 20
+    call Math.multiply 2
+    add
+    push argument 1
+    add
+    pop local 0
+    push local 0
+    push constant 0
+    lt
+    push local 0
+    push constant 319
+    gt
+    or
+    not
+    if-goto ELSE$50
+    push constant 0
+    return
+    goto ENDIF$51
+label ELSE$50
+label ENDIF$51
+    push this 0
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    pop local 2
+    push local 2
+    push constant 1
+    eq
+    push local 2
+    push constant 0
+    eq
+    or
+    not
+    if-goto ELSE$53
+    push constant 0
+    return
+    goto ENDIF$54
+label ELSE$53
+label ENDIF$54
+    push this 1
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    pop local 4
+    push local 4
+    not
+    if-goto ELSE$56
+    push local 0
+    push argument 2
+    push constant 20
+    call Math.multiply 2
+    add
+    push argument 1
+    add
+    pop local 1
+    push local 1
+    push constant 0
+    lt
+    push local 1
+    push constant 319
+    gt
+    or
+    not
+    if-goto ELSE$59
+    push constant 0
+    return
+    goto ENDIF$60
+label ELSE$59
+label ENDIF$60
+    push this 0
+    push local 1
+    add
+    pop pointer 1
+    push that 0
+    pop local 3
+    push local 3
+    push constant 1
+    eq
+    push local 3
+    push constant 0
+    eq
+    or
+    not
+    if-goto ELSE$62
+    push constant 0
+    return
+    goto ENDIF$63
+label ELSE$62
+label ENDIF$63
+    push this 1
+    push local 1
+    add
+    pop pointer 1
+    push that 0
+    not
+    if-goto ELSE$65
+    push constant 0
+    return
+    goto ENDIF$66
+label ELSE$65
+label ENDIF$66
+    push local 0
+    push this 1
+    add
+    push constant 0
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 1
+    push this 1
+    add
+    push constant 1
+    neg
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 1
+    neg
+    pop local 5
+    push this 7
+    push constant 1
+    add
+    pop this 7
+    goto ENDIF$57
+label ELSE$56
+    push constant 0
+    pop local 5
+label ENDIF$57
+    push local 0
+    pop this 4
+    push constant 0
+    pop local 6
+    push argument 1
+    push constant 1
+    neg
+    eq
+    push argument 2
+    push constant 0
+    eq
+    and
+    not
+    if-goto ELSE$68
+    push constant 0
+    pop local 6
+    goto ENDIF$69
+label ELSE$68
+label ENDIF$69
+    push argument 1
+    push constant 0
+    eq
+    push argument 2
+    push constant 1
+    neg
+    eq
+    and
+    not
+    if-goto ELSE$71
+    push constant 1
+    pop local 6
+    goto ENDIF$72
+label ELSE$71
+label ENDIF$72
+    push argument 1
+    push constant 1
+    eq
+    push argument 2
+    push constant 0
+    eq
+    and
+    not
+    if-goto ELSE$74
+    push constant 2
+    pop local 6
+    goto ENDIF$75
+label ELSE$74
+label ENDIF$75
+    push argument 1
+    push constant 0
+    eq
+    push argument 2
+    push constant 1
+    eq
+    and
+    not
+    if-goto ELSE$77
+    push constant 3
+    pop local 6
+    goto ENDIF$78
+label ELSE$77
+label ENDIF$78
+    push local 5
+    not
+    if-goto ELSE$80
+    push local 6
+    push constant 4
+    add
+    pop local 6
+    goto ENDIF$81
+label ELSE$80
+label ENDIF$81
+    push this 8
+    push this 4
+    push local 6
+    call History.push 3
+    pop temp 0
+    push this 6
+    push constant 1
+    add
+    pop this 6
+    push constant 1
+    neg
+    return
+function Board.undo 8
+    push argument 0
+    pop pointer 0
+    push this 8
+    call History.pop 1
+    not
+    not
+    if-goto ELSE$83
+    push constant 0
+    return
+    goto ENDIF$84
+label ELSE$83
+label ENDIF$84
+    push this 8
+    call History.getPosition 1
+    pop local 0
+    push this 8
+    call History.getAction 1
+    pop local 1
+    push local 1
+    push constant 3
+    and
+    pop local 2
+    push local 1
+    push constant 4
+    and
+    push constant 4
+    eq
+    pop local 5
+    push constant 0
+    pop local 6
+    push constant 0
+    pop local 7
+    push local 2
+    push constant 0
+    eq
+    not
+    if-goto ELSE$86
+    push constant 1
+    neg
+    pop local 6
+    goto ENDIF$87
+label ELSE$86
+label ENDIF$87
+    push local 2
+    push constant 1
+    eq
+    not
+    if-goto ELSE$89
+    push constant 1
+    neg
+    pop local 7
+    goto ENDIF$90
+label ELSE$89
+label ENDIF$90
+    push local 2
+    push constant 2
+    eq
+    not
+    if-goto ELSE$92
+    push constant 1
+    pop local 6
+    goto ENDIF$93
+label ELSE$92
+label ENDIF$93
+    push local 2
+    push constant 3
+    eq
+    not
+    if-goto ELSE$95
+    push constant 1
+    pop local 7
+    goto ENDIF$96
+label ELSE$95
+label ENDIF$96
+    push local 5
+    not
+    if-goto ELSE$98
+    push local 0
+    push local 7
+    push constant 20
+    call Math.multiply 2
+    add
+    push local 6
+    add
+    pop local 4
+    push local 0
+    pop local 3
+    push local 4
+    push this 1
+    add
+    push constant 0
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 3
+    push this 1
+    add
+    push constant 1
+    neg
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push this 7
+    push constant 1
+    sub
+    pop this 7
+    goto ENDIF$99
+label ELSE$98
+label ENDIF$99
+    push local 0
+    push local 7
+    push constant 20
+    call Math.multiply 2
+    sub
+    push local 6
+    sub
+    pop this 4
+    push this 6
+    push constant 1
+    sub
+    pop this 6
+    push constant 1
+    neg
+    return
+function Board.solved 2
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 1
+    push constant 0
+    pop local 0
+label WHILE$100
+    push local 0
+    push constant 320
+    lt
+    not
+    if-goto ENDWHILE$101
+    push this 1
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    not
+    if-goto ELSE$103
+    push this 0
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    push constant 3
+    eq
+    not
+    if-goto ELSE$106
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto ENDIF$107
+label ELSE$106
+label ENDIF$107
+    goto ENDIF$104
+label ELSE$103
+label ENDIF$104
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto WHILE$100
+label ENDWHILE$101
+    push local 1
+    push this 9
+    eq
+    return
+function Board.load 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push constant 1
+    lt
+    not
+    if-goto ELSE$109
+    push constant 1
+    pop argument 1
+    goto ENDIF$110
+label ELSE$109
+label ENDIF$110
+    push argument 1
+    push constant 50
+    gt
+    not
+    if-goto ELSE$112
+    push constant 50
+    pop argument 1
+    goto ENDIF$113
+label ELSE$112
+label ENDIF$113
+    push pointer 0
+    call Board.clear 1
+    pop temp 0
+    push argument 1
+    pop this 5
+    push pointer 0
+    push argument 1
+    call Levels.load 2
+    pop temp 0
+    push constant 0
+    return

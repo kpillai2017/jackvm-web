@@ -33,7 +33,8 @@ test('game-like upload reports missing OS and accepts a separately selected OS f
     await page.goto('/');
     await page.locator('#local-files').setInputFiles(fixture('Main.vm','function Main.main 0\ncall Helper.answer 0\npop temp 0\npush constant 0\nreturn'));
     await expect(page.locator('#load-feedback')).toContainText('program classes: Helper');
-    await expect(page.locator('#run-btn')).toBeDisabled();
+    // The valid preloaded Sokoban remains paused after a failed replacement.
+    await expect(page.locator('#run-btn')).toBeEnabled();
     await page.locator('#add-folder').setInputFiles(folder);
     await expect(page.locator('#load-feedback')).toContainText('Loaded 2 local VM');
     await page.click('#run-btn');await expect(page.locator('#status-value')).toHaveText('Halted');

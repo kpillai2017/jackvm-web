@@ -1,0 +1,13 @@
+/** Standard Jack entry point. Sys.init initializes the OS before calling us.
+ * Main owns exactly one Game; Game in turn owns its collaborators. Returning
+ * releases those objects before the OS enters its normal halt loop.
+ */
+class Main {
+    function void main() {
+        var Game game;
+        let game = Game.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}

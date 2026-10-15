@@ -1,0 +1,126 @@
+/** Portable saves without a host filesystem.
+ * A save is a versioned hexadecimal description, NOT a pointer into RAM.
+ * Layout: version(1), level(2), moves(4), pushes(4), player(3),
+ * sorted box positions(3 each), checksum(3). Positions use Board's stride 20.
+ * All parsing happens in a temporary Board. The live model changes only after
+ * length, checksum, counts, terrain and occupancy have been validated.
+ * This is corruption detection, not encryption or proof of puzzle reachability.
+ */
+class SaveCodec {
+    function int digit(int c) {
+        if ((c > 47) & (c < 58)) { return c - 48; }
+        if ((c > 64) & (c < 71)) { return c - 55; }
+        if ((c > 96) & (c < 103)) { return c - 87; }
+        return -1;
+    }
+    /** Append a fixed-width, big-endian hexadecimal number. */
+    function void put(String s, int value, int width) {
+        var int divisor, i, d;
+        let divisor = 1; let i = 1;
+        while (i < width) { let divisor = divisor * 16; let i = i + 1; }
+        while (width > 0) {
+            let d = value / divisor;
+            if (d < 10) { do s.appendChar(48 + d); }
+            else { do s.appendChar(55 + d); }
+            let value = value - (d * divisor);
+            let divisor = divisor / 16; let width = width - 1;
+        }
+        return;
+    }
+    /** Input has already passed digit validation; four-digit values must be
+     * <=7FFF because Jack integers are signed. decode checks the high digit. */
+    function int get(String s, int start, int width) {
+        var int value, i;
+        let value = 0; let i = 0;
+        while (i < width) {
+            let value = (value * 16) + SaveCodec.digit(s.charAt(start + i));
+            let i = i + 1;
+        }
+        return value;
+    }
+    function int checksum(String s, int count) {
+        var int sum, i;
+        let sum = 0; let i = 0;
+        while (i < count) {
+            // The largest intermediate is below 8192: no signed overflow.
+            let sum = sum + SaveCodec.digit(s.charAt(i)) + i;
+            if (sum > 4092) { let sum = sum - 4093; }
+            let i = i + 1;
+        }
+        return sum;
+    }
+    /** Caller owns the returned string, including when used as an RAM save. */
+    function String encode(Board board) {
+        var String s;
+        var int i;
+        let s = String.new(160);
+        do s.appendChar(49);
+        do SaveCodec.put(s, board.getLevel(), 2);
+        do SaveCodec.put(s, board.getMoves(), 4);
+        do SaveCodec.put(s, board.getPushes(), 4);
+        do SaveCodec.put(s, board.getPlayer(), 3);
+        let i = 0;
+        while (i < 320) {
+            if (board.boxAt(i)) { do SaveCodec.put(s, i, 3); }
+            let i = i + 1;
+        }
+        do SaveCodec.put(s, SaveCodec.checksum(s, s.length()), 3);
+        return s;
+    }
+    /** Copy only mutable state, reloading immutable terrain by level number.
+     * Undo is intentionally cleared: its commands belong to the old timeline. */
+    function void copy(Board source, Board target) {
+        var int i;
+        do target.load(source.getLevel());
+        let i = 0;
+        while (i < 320) {
+            do target.setBox(i, source.boxAt(i));
+            let i = i + 1;
+        }
+        do target.setPlayer(source.getPlayer());
+        do target.setCounters(source.getMoves(), source.getPushes());
+        do target.clearHistory();
+        return;
+    }
+    function boolean decode(String s, Board target) {
+        var int n, i, level, moves, pushes, player, pos, previous, expected;
+        var Board candidate;
+        var boolean valid;
+        let n = s.length();
+        if ((n < 20) | (n > 119)) { return false; }
+        let i = 0;
+        while (i < n) {
+            if (SaveCodec.digit(s.charAt(i)) < 0) { return false; }
+            let i = i + 1;
+        }
+        if (~(s.charAt(0) = 49)) { return false; }
+        if ((SaveCodec.digit(s.charAt(3)) > 7) |
+            (SaveCodec.digit(s.charAt(7)) > 7)) { return false; }
+        if (~(SaveCodec.get(s, n - 3, 3) = SaveCodec.checksum(s, n - 3))) { return false; }
+        let level = SaveCodec.get(s, 1, 2);
+        if ((level < 1) | (level > 50)) { return false; }
+        let moves = SaveCodec.get(s, 3, 4); let pushes = SaveCodec.get(s, 7, 4);
+        if (pushes > moves) { return false; }
+        let candidate = Board.new(); do candidate.load(level);
+        let expected = candidate.getBoxCount();
+        let valid = (n = (17 + (expected * 3)));
+        let player = SaveCodec.get(s, 11, 3);
+        if (candidate.terrainAt(player) < 2) { let valid = false; }
+        let i = 0;
+        while (i < 320) { do candidate.setBox(i, false); let i = i + 1; }
+        let i = 14; let previous = -1;
+        while ((i < (n - 3)) & valid) {
+            let pos = SaveCodec.get(s, i, 3);
+            if ((pos < (previous + 1)) | (candidate.terrainAt(pos) < 2) | (pos = player)) {
+                let valid = false;
+            } else { do candidate.setBox(pos, true); }
+            let previous = pos; let i = i + 3;
+        }
+        if (valid) {
+            do candidate.setPlayer(player); do candidate.setCounters(moves, pushes);
+            do SaveCodec.copy(candidate, target);
+        }
+        do candidate.dispose();
+        return valid;
+    }
+}

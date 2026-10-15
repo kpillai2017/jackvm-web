@@ -1,21 +1,24 @@
-# Verification record — local-file-only application
+# Verification record — bundled Sokoban and local-file loading
 
-Verified locally on **15 October 2026** with embedded Jack OS and no bundled games.
-The original verification was local. Publication checks were rerun on
-16 October 2026: 20 runtime/contrast tests and 29 Chromium browser tests passed.
-GitHub publication and deployment status can be checked in the repository's
-Actions tab: https://github.com/kpillai2017/jackvm-web/actions .
+Verified locally on **16 October 2026** with embedded Jack OS and bundled Sokoban
+preloaded at startup (paused). The original verification was local. Publication
+checks were rerun on 16 October 2026: 20 runtime/contrast tests and 29 Chromium
+browser tests passed. GitHub publication and deployment status can be checked in
+the repository's Actions tab: https://github.com/kpillai2017/jackvm-web/actions .
 
 ## Results
 
 - `npm test`: **20 passed**. Compiles and exercises the real WASM CPU,
   including merged multi-class static isolation, built-in OS linking, and
   complete missing-call lists.
-- `PLAYWRIGHT_BROWSERS_PATH=0 npm run test:browser`: **29 passed**,
-  using Chromium. This command rebuilds the application with embedded OS first.
-- The project and dist have no games/, examples/ folders or downloadable `.vm` game assets.
-- The embedded Jack OS (`web/builtin-os.js`) is generated and checked in; no
-  sibling repositories are needed for normal builds or deployment.
+- `PLAYWRIGHT_BROWSERS_PATH=0 npm run test:browser`: **31 passed**,
+  using Chromium. This command rebuilds the application with embedded OS and
+  bundled Sokoban first.
+- The project and dist include Sokoban bundled (seven VM files, GPL2-licensed,
+  source in corresponding-source/sokoban); no other games, examples/ folders or
+  downloadable `.vm` game assets.
+- The embedded Jack OS (`web/builtin-os.js`) and Sokoban are generated and checked
+  in; no sibling repositories are needed for normal builds or deployment.
 - No obsolete game import tool, private-build script, manifests or alternate
   picker modes remain. The local static server serves the refreshed application.
 - Folder test fixtures used a workspace-local `tmp_rovo_` prefix and were removed
@@ -67,17 +70,16 @@ checks are targeted safeguards, not a complete accessibility certification.
 
 ## Limits
 
-No legacy games are shipped or required by the portable automated suite.
-The built-in OS is automatically supplied; users need only provide their game
-programs. Standard Jack OS functions (Sys, Memory, Math, Screen, Output, Keyboard,
-Array, String, Clock, Timer, Console, Input, IntStack, IntQueue, Random) are
-embedded and linked transparently. Additional local Chromium checks selected
-chess, pacman, sokoban, space-invaders and tetris from sibling jackos/games
-folders without selecting any OS files. All reached screen output without
-runtime faults. These checks read local games and do not copy games into the
-application or dist. They verify startup, not complete gameplay. Passing checks
-do not prove every possible VM program or game path is correct. No Safari,
-Firefox, mobile browser, complete accessibility audit, long-session heap stress
-or live GitHub Pages deployment was tested. Standard VM syntax and the four
-documented host hooks are supported; arbitrary VM-language extensions are not
-implied.
+Sokoban is bundled and preloaded at startup (paused); the portable automated suite
+does not require additional legacy games. The built-in OS is automatically supplied.
+Standard Jack OS functions (Sys, Memory, Math, Screen, Output, Keyboard, Array,
+String, Clock, Timer, Console, Input, IntStack, IntQueue, Random) are embedded and
+linked transparently. Users may additionally load custom game programs via the file
+picker. Local Chromium checks verified Sokoban startup, drawing, keyboard input and
+basic gameplay without runtime faults. These checks verify bundled Sokoban and
+startup, not complete gameplay of all possible programs. Passing checks do not prove
+every possible VM program or game path is correct. No Safari, Firefox, mobile browser,
+complete accessibility audit, long-session heap stress or live GitHub Pages
+deployment was tested. Standard VM syntax and the four documented host hooks are
+supported; arbitrary VM-language extensions are not implied. Sokoban GPL2 license
+and source provenance are documented in SOKOBAN_LICENSE.txt and SOKOBAN_PROVENANCE.md.

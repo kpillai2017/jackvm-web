@@ -21,7 +21,9 @@ jobs:
           test -f dist/index.html
           test -f dist/styles.css
           test -f dist/web/runtime.wasm
-          test ! -d dist/games
+          test -f dist/games/sokoban/Main.vm
+          test -f dist/corresponding-source/sokoban/Main.jack
+          test -f dist/corresponding-source/sokoban/LICENSE
           test ! -d dist/os
           test ! -d dist/examples
-          test -z "$(find dist -type f -iname '*.vm' -print -quit)"
+          test "$(find dist/games -type f -name '*.vm' | wc -l)" -eq 7

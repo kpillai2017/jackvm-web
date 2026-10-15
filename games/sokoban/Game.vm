@@ -1,0 +1,1867 @@
+function Game.new 0
+    push constant 4
+    call Memory.alloc 1
+    pop pointer 0
+    call Board.new 0
+    pop this 0
+    push this 0
+    push constant 1
+    call Board.load 2
+    pop temp 0
+    call Draw.new 0
+    pop this 1
+    push constant 0
+    pop this 2
+    push constant 0
+    pop this 3
+    push pointer 0
+    return
+function Game.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    push constant 0
+    eq
+    not
+    not
+    if-goto ELSE$1
+    push this 2
+    call String.dispose 1
+    pop temp 0
+    goto ENDIF$2
+label ELSE$1
+label ENDIF$2
+    push this 1
+    call Draw.dispose 1
+    pop temp 0
+    push this 0
+    call Board.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Game.getBoard 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Game.run 2
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 1
+    push this 1
+    push this 0
+    push this 2
+    push constant 0
+    eq
+    not
+    push constant 0
+    call Draw.full 4
+    pop temp 0
+label WHILE$3
+    push this 3
+    not
+    not
+    if-goto ENDWHILE$4
+    call Keyboard.keyPressed 0
+    pop local 0
+    push local 0
+    push constant 0
+    eq
+    not
+    push local 0
+    push local 1
+    eq
+    not
+    and
+    not
+    if-goto ELSE$6
+    push pointer 0
+    push local 0
+    call Game.command 2
+    pop temp 0
+    goto ENDIF$7
+label ELSE$6
+label ENDIF$7
+    push local 0
+    pop local 1
+    push constant 5
+    call Sys.wait 1
+    pop temp 0
+    goto WHILE$3
+label ENDWHILE$4
+    push constant 0
+    return
+function Game.command 6
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push constant 96
+    gt
+    push argument 1
+    push constant 123
+    lt
+    and
+    not
+    if-goto ELSE$9
+    push argument 1
+    push constant 32
+    sub
+    pop argument 1
+    goto ENDIF$10
+label ELSE$9
+label ENDIF$10
+    push this 0
+    call Board.getPlayer 1
+    pop local 0
+    push constant 0
+    pop local 4
+    push constant 0
+    pop local 5
+    push constant 0
+    pop local 2
+    push argument 1
+    push constant 130
+    eq
+    push argument 1
+    push constant 65
+    eq
+    or
+    not
+    if-goto ELSE$12
+    push this 0
+    push constant 1
+    neg
+    push constant 0
+    call Board.move 3
+    pop local 4
+    goto ENDIF$13
+label ELSE$12
+label ENDIF$13
+    push argument 1
+    push constant 131
+    eq
+    push argument 1
+    push constant 87
+    eq
+    or
+    not
+    if-goto ELSE$15
+    push this 0
+    push constant 0
+    push constant 1
+    neg
+    call Board.move 3
+    pop local 4
+    goto ENDIF$16
+label ELSE$15
+label ENDIF$16
+    push argument 1
+    push constant 132
+    eq
+    push argument 1
+    push constant 68
+    eq
+    or
+    not
+    if-goto ELSE$18
+    push this 0
+    push constant 1
+    push constant 0
+    call Board.move 3
+    pop local 4
+    goto ENDIF$19
+label ELSE$18
+label ENDIF$19
+    push argument 1
+    push constant 133
+    eq
+    not
+    if-goto ELSE$21
+    push this 0
+    push constant 0
+    push constant 1
+    call Board.move 3
+    pop local 4
+    goto ENDIF$22
+label ELSE$21
+label ENDIF$22
+    push argument 1
+    push constant 74
+    eq
+    not
+    if-goto ELSE$24
+    push this 0
+    push constant 0
+    push constant 1
+    call Board.move 3
+    pop local 4
+    goto ENDIF$25
+label ELSE$24
+label ENDIF$25
+    push argument 1
+    push constant 85
+    eq
+    not
+    if-goto ELSE$27
+    push this 0
+    call Board.undo 1
+    pop local 4
+    push local 4
+    not
+    not
+    if-goto ELSE$30
+    push constant 6
+    pop local 2
+    goto ENDIF$31
+label ELSE$30
+label ENDIF$31
+    goto ENDIF$28
+label ELSE$27
+label ENDIF$28
+    push argument 1
+    push constant 82
+    eq
+    not
+    if-goto ELSE$33
+    push this 0
+    push this 0
+    call Board.getLevel 1
+    call Board.load 2
+    pop temp 0
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$34
+label ELSE$33
+label ENDIF$34
+    push this 0
+    call Board.getLevel 1
+    pop local 3
+    push argument 1
+    push constant 78
+    eq
+    push local 3
+    push constant 50
+    lt
+    and
+    not
+    if-goto ELSE$36
+    push this 0
+    push local 3
+    push constant 1
+    add
+    call Board.load 2
+    pop temp 0
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$37
+label ELSE$36
+label ENDIF$37
+    push argument 1
+    push constant 66
+    eq
+    push local 3
+    push constant 1
+    gt
+    and
+    not
+    if-goto ELSE$39
+    push this 0
+    push local 3
+    push constant 1
+    sub
+    call Board.load 2
+    pop temp 0
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$40
+label ELSE$39
+label ENDIF$40
+    push argument 1
+    push constant 83
+    eq
+    not
+    if-goto ELSE$42
+    push this 2
+    push constant 0
+    eq
+    not
+    not
+    if-goto ELSE$45
+    push this 2
+    call String.dispose 1
+    pop temp 0
+    goto ENDIF$46
+label ELSE$45
+label ENDIF$46
+    push this 0
+    call SaveCodec.encode 1
+    pop this 2
+    push constant 1
+    pop local 2
+    goto ENDIF$43
+label ELSE$42
+label ENDIF$43
+    push argument 1
+    push constant 76
+    eq
+    not
+    if-goto ELSE$48
+    push this 2
+    push constant 0
+    eq
+    not
+    if-goto ELSE$51
+    push constant 3
+    pop local 2
+    goto ENDIF$52
+label ELSE$51
+    push this 2
+    push this 0
+    call SaveCodec.decode 2
+    not
+    if-goto ELSE$54
+    push constant 2
+    pop local 2
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$55
+label ELSE$54
+    push constant 4
+    pop local 2
+label ENDIF$55
+label ENDIF$52
+    goto ENDIF$49
+label ELSE$48
+label ENDIF$49
+    push argument 1
+    push constant 69
+    eq
+    not
+    if-goto ELSE$57
+    push pointer 0
+    call Game.exportSave 1
+    pop temp 0
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$58
+label ELSE$57
+label ENDIF$58
+    push argument 1
+    push constant 73
+    eq
+    not
+    if-goto ELSE$60
+    push pointer 0
+    call Game.importSave 1
+    not
+    if-goto ELSE$63
+    push constant 2
+    pop local 2
+    goto ENDIF$64
+label ELSE$63
+    push constant 4
+    pop local 2
+label ENDIF$64
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$61
+label ELSE$60
+label ENDIF$61
+    push argument 1
+    push constant 81
+    eq
+    push argument 1
+    push constant 140
+    eq
+    or
+    not
+    if-goto ELSE$66
+    push constant 1
+    neg
+    pop this 3
+    goto ENDIF$67
+label ELSE$66
+label ENDIF$67
+    push this 0
+    call Board.getMoves 1
+    push constant 32767
+    eq
+    not
+    if-goto ELSE$69
+    push constant 5
+    pop local 2
+    goto ENDIF$70
+label ELSE$69
+label ENDIF$70
+    push local 5
+    not
+    if-goto ELSE$72
+    push this 1
+    push this 0
+    push this 2
+    push constant 0
+    eq
+    not
+    push local 2
+    call Draw.full 4
+    pop temp 0
+    goto ENDIF$73
+label ELSE$72
+    push local 4
+    not
+    if-goto ELSE$75
+    push this 0
+    call Board.getPlayer 1
+    pop local 1
+    push this 1
+    push this 0
+    push local 0
+    push local 1
+    call Draw.changed 4
+    pop temp 0
+    goto ENDIF$76
+label ELSE$75
+label ENDIF$76
+    push this 1
+    push this 0
+    push this 2
+    push constant 0
+    eq
+    not
+    push local 2
+    call Draw.status 4
+    pop temp 0
+label ENDIF$73
+    push constant 0
+    return
+function Game.text 0
+    push argument 0
+    push constant 1
+    call Output.moveCursor 2
+    pop temp 0
+    push argument 1
+    call Output.printString 1
+    pop temp 0
+    push argument 1
+    call String.dispose 1
+    pop temp 0
+    push constant 0
+    return
+function Game.readReleased 1
+label WHILE$77
+    call Keyboard.keyPressed 0
+    push constant 0
+    eq
+    not
+    not
+    if-goto ENDWHILE$78
+    goto WHILE$77
+label ENDWHILE$78
+    push constant 0
+    pop local 0
+label WHILE$79
+    push local 0
+    push constant 0
+    eq
+    not
+    if-goto ENDWHILE$80
+    call Keyboard.keyPressed 0
+    pop local 0
+    goto WHILE$79
+label ENDWHILE$80
+label WHILE$81
+    call Keyboard.keyPressed 0
+    push constant 0
+    eq
+    not
+    not
+    if-goto ENDWHILE$82
+    goto WHILE$81
+label ENDWHILE$82
+    push local 0
+    return
+function Game.exportSave 5
+    push argument 0
+    pop pointer 0
+    push this 0
+    call SaveCodec.encode 1
+    pop local 0
+    call Screen.clearScreen 0
+    pop temp 0
+    push constant 1
+    push constant 40
+    call String.new 1
+    push constant 83
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 75
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 66
+    call String.appendChar 2
+    push constant 65
+    call String.appendChar 2
+    push constant 78
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 45
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 80
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 82
+    call String.appendChar 2
+    push constant 84
+    call String.appendChar 2
+    push constant 65
+    call String.appendChar 2
+    push constant 66
+    call String.appendChar 2
+    push constant 76
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 83
+    call String.appendChar 2
+    push constant 65
+    call String.appendChar 2
+    push constant 86
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 67
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 68
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 40
+    call String.appendChar 2
+    push constant 118
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 49
+    call String.appendChar 2
+    push constant 41
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 3
+    push constant 45
+    call String.new 1
+    push constant 67
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 121
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 72
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 88
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 103
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 98
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 119
+    call String.appendChar 2
+    push constant 44
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 106
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 103
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 0
+    pop local 1
+    push constant 5
+    pop local 2
+    push constant 1
+    pop local 3
+label WHILE$83
+    push local 1
+    push local 0
+    call String.length 1
+    lt
+    not
+    if-goto ENDWHILE$84
+    push local 2
+    push local 3
+    call Output.moveCursor 2
+    pop temp 0
+    push local 0
+    push local 1
+    call String.charAt 2
+    call Output.printChar 1
+    pop temp 0
+    push local 3
+    push constant 1
+    add
+    pop local 3
+    push local 3
+    push constant 49
+    eq
+    not
+    if-goto ELSE$86
+    push local 2
+    push constant 1
+    add
+    pop local 2
+    push constant 1
+    pop local 3
+    goto ENDIF$87
+label ELSE$86
+label ENDIF$87
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto WHILE$83
+label ENDWHILE$84
+    push constant 11
+    push constant 46
+    call String.new 1
+    push constant 73
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 109
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 59
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 83
+    call String.appendChar 2
+    push constant 47
+    call String.appendChar 2
+    push constant 76
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 45
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 13
+    push constant 48
+    call String.new 1
+    push constant 67
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 118
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 44
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 44
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 107
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 98
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 120
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 15
+    push constant 49
+    call String.new 1
+    push constant 85
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 121
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 118
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 75
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 120
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 103
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 18
+    push constant 36
+    call String.new 1
+    push constant 80
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 121
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 107
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 121
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    call Game.readReleased 0
+    pop local 4
+    push local 0
+    call String.dispose 1
+    pop temp 0
+    push constant 0
+    return
+function Game.importSave 8
+    push argument 0
+    pop pointer 0
+    push constant 119
+    call String.new 1
+    pop local 0
+    push constant 0
+    pop local 5
+    push constant 0
+    pop local 6
+    call Screen.clearScreen 0
+    pop temp 0
+    push constant 1
+    push constant 37
+    call String.new 1
+    push constant 73
+    call String.appendChar 2
+    push constant 77
+    call String.appendChar 2
+    push constant 80
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 82
+    call String.appendChar 2
+    push constant 84
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 83
+    call String.appendChar 2
+    push constant 65
+    call String.appendChar 2
+    push constant 86
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 45
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 121
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 120
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 109
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 103
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 3
+    push constant 46
+    call String.new 1
+    push constant 69
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 66
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 107
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 11
+    push constant 52
+    call String.new 1
+    push constant 83
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 103
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 82
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 106
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 120
+    call String.appendChar 2
+    push constant 112
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 100
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 108
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 115
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 119
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 104
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 69
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 116
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 46
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+label WHILE$88
+    push local 5
+    not
+    not
+    if-goto ENDWHILE$89
+    push constant 5
+    push constant 48
+    call String.new 1
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 6
+    push constant 48
+    call String.new 1
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 7
+    push constant 48
+    call String.new 1
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Game.text 2
+    pop temp 0
+    push constant 0
+    pop local 2
+    push constant 5
+    pop local 3
+    push constant 1
+    pop local 4
+label WHILE$90
+    push local 2
+    push local 0
+    call String.length 1
+    lt
+    not
+    if-goto ENDWHILE$91
+    push local 3
+    push local 4
+    call Output.moveCursor 2
+    pop temp 0
+    push local 0
+    push local 2
+    call String.charAt 2
+    call Output.printChar 1
+    pop temp 0
+    push local 4
+    push constant 1
+    add
+    pop local 4
+    push local 4
+    push constant 49
+    eq
+    not
+    if-goto ELSE$93
+    push local 3
+    push constant 1
+    add
+    pop local 3
+    push constant 1
+    pop local 4
+    goto ENDIF$94
+label ELSE$93
+label ENDIF$94
+    push local 2
+    push constant 1
+    add
+    pop local 2
+    goto WHILE$90
+label ENDWHILE$91
+    push local 3
+    push local 4
+    call Output.moveCursor 2
+    pop temp 0
+    push constant 95
+    call Output.printChar 1
+    pop temp 0
+    call Game.readReleased 0
+    pop local 1
+    push local 1
+    push constant 140
+    eq
+    not
+    if-goto ELSE$96
+    push constant 1
+    neg
+    pop local 6
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$97
+label ELSE$96
+label ENDIF$97
+    push local 1
+    push constant 128
+    eq
+    not
+    if-goto ELSE$99
+    push constant 1
+    neg
+    pop local 5
+    goto ENDIF$100
+label ELSE$99
+label ENDIF$100
+    push local 1
+    push constant 129
+    eq
+    push local 0
+    call String.length 1
+    push constant 0
+    gt
+    and
+    not
+    if-goto ELSE$102
+    push local 0
+    call String.eraseLastChar 1
+    pop temp 0
+    goto ENDIF$103
+label ELSE$102
+label ENDIF$103
+    push local 1
+    call SaveCodec.digit 1
+    push constant 1
+    neg
+    gt
+    push local 0
+    call String.length 1
+    push constant 119
+    lt
+    and
+    not
+    if-goto ELSE$105
+    push local 1
+    push constant 96
+    gt
+    push local 1
+    push constant 103
+    lt
+    and
+    not
+    if-goto ELSE$108
+    push local 1
+    push constant 32
+    sub
+    pop local 1
+    goto ENDIF$109
+label ELSE$108
+label ENDIF$109
+    push local 0
+    push local 1
+    call String.appendChar 2
+    pop temp 0
+    goto ENDIF$106
+label ELSE$105
+label ENDIF$106
+    goto WHILE$88
+label ENDWHILE$89
+    push constant 0
+    pop local 7
+    push local 6
+    not
+    not
+    if-goto ELSE$111
+    push local 0
+    push this 0
+    call SaveCodec.decode 2
+    pop local 7
+    goto ENDIF$112
+label ELSE$111
+label ENDIF$112
+    push local 0
+    call String.dispose 1
+    pop temp 0
+    push local 7
+    return

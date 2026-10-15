@@ -1,0 +1,160 @@
+/** Application controller. Board owns rules, Draw owns pixels, SaveCodec owns
+ * serialization. None of these collaborators polls the keyboard.
+ * Each command is edge-triggered: release before pressing the same key again.
+ * This avoids accidental repeated pushes and works with Hack's one-key register.
+ */
+class Game {
+    field Board board;
+    field Draw view;
+    field String saved;
+    field boolean quit;
+
+    constructor Game new() {
+        let board = Board.new(); do board.load(1);
+        let view = Draw.new(); let saved = null; let quit = false;
+        return this;
+    }
+    method void dispose() {
+        if (~(saved = null)) { do saved.dispose(); }
+        do view.dispose(); do board.dispose(); do Memory.deAlloc(this);
+        return;
+    }
+    /** Borrowed query for teaching/tests; Game retains ownership. */
+    method Board getBoard() { return board; }
+    method void run() {
+        var int key, previous;
+        let previous = 0;
+        do view.full(board, ~(saved = null), 0);
+        while (~quit) {
+            let key = Keyboard.keyPressed();
+            if ((~(key = 0)) & (~(key = previous))) { do command(key); }
+            let previous = key;
+            // Polling is VM work, not a promise about elapsed milliseconds.
+            do Sys.wait(5);
+        }
+        return;
+    }
+    /** One command, one state transition. Commands can also be tested without
+     * manufacturing keyboard timings. Upper/lowercase letters are equivalent. */
+    method void command(int key) {
+        var int old, current, message, level;
+        var boolean changed, repaint;
+        if ((key > 96) & (key < 123)) { let key = key - 32; }
+        let old = board.getPlayer(); let changed = false;
+        let repaint = false; let message = 0;
+        if ((key = 130) | (key = 65)) { let changed = board.move(-1, 0); }
+        if ((key = 131) | (key = 87)) { let changed = board.move(0, -1); }
+        if ((key = 132) | (key = 68)) { let changed = board.move(1, 0); }
+        if (key = 133) { let changed = board.move(0, 1); }
+        // J is the alternative downward key: WASD would conflict with Save.
+        if (key = 74) { let changed = board.move(0, 1); }
+        if (key = 85) {
+            let changed = board.undo(); if (~changed) { let message = 6; }
+        }
+        if (key = 82) { do board.load(board.getLevel()); let repaint = true; }
+        let level = board.getLevel();
+        if ((key = 78) & (level < 50)) { do board.load(level + 1); let repaint = true; }
+        if ((key = 66) & (level > 1)) { do board.load(level - 1); let repaint = true; }
+        if (key = 83) {
+            if (~(saved = null)) { do saved.dispose(); }
+            let saved = SaveCodec.encode(board); let message = 1;
+        }
+        if (key = 76) {
+            if (saved = null) { let message = 3; }
+            else {
+                if (SaveCodec.decode(saved, board)) { let message = 2; let repaint = true; }
+                else { let message = 4; }
+            }
+        }
+        if (key = 69) { do exportSave(); let repaint = true; }
+        if (key = 73) {
+            if (importSave()) { let message = 2; } else { let message = 4; }
+            let repaint = true;
+        }
+        if ((key = 81) | (key = 140)) { let quit = true; }
+        if (board.getMoves() = 32767) { let message = 5; }
+        if (repaint) { do view.full(board, ~(saved = null), message); }
+        else {
+            if (changed) {
+                let current = board.getPlayer(); do view.changed(board, old, current);
+            }
+            do view.status(board, ~(saved = null), message);
+        }
+        return;
+    }
+    /** Modal screens use a small owned-string helper: string literals allocate
+     * on the Jack heap, so even repeated help screens must dispose them. */
+    function void text(int row, String s) {
+        do Output.moveCursor(row, 1); do Output.printString(s); do s.dispose();
+        return;
+    }
+    function int readReleased() {
+        var int key;
+        while (~(Keyboard.keyPressed() = 0)) { }
+        let key = 0;
+        while (key = 0) { let key = Keyboard.keyPressed(); }
+        while (~(Keyboard.keyPressed() = 0)) { }
+        return key;
+    }
+    /** Export the current position (not just the RAM slot). A photo or copied
+     * text survives VM shutdown. No host filesystem extension is needed. */
+    method void exportSave() {
+        var String code;
+        var int i, row, col, ignored;
+        let code = SaveCodec.encode(board);
+        do Screen.clearScreen();
+        do Game.text(1, "SOKOBAN - PORTABLE SAVE CODE (version 1)");
+        do Game.text(3, "Copy the HEX digits below, joining the lines.");
+        let i = 0; let row = 5; let col = 1;
+        while (i < code.length()) {
+            do Output.moveCursor(row, col); do Output.printChar(code.charAt(i));
+            let col = col + 1;
+            if (col = 49) { let row = row + 1; let col = 1; }
+            let i = i + 1;
+        }
+        do Game.text(11, "I imports a code; S/L use the in-session slot.");
+        do Game.text(13, "Code includes level, counters, keeper and boxes.");
+        do Game.text(15, "Undo history is not saved. Keep the exact digits.");
+        do Game.text(18, "Press and release any key to return.");
+        let ignored = Game.readReleased(); do code.dispose();
+        return;
+    }
+    /** A bounded editor rather than Keyboard.readLine's 80-character limit.
+     * At most 119 digits (34 boxes). Space separates pasted groups; Backspace
+     * edits; Return commits; Escape cancels. The model is unchanged on error. */
+    method boolean importSave() {
+        var String code;
+        var int key, i, row, col;
+        var boolean done, cancelled, ok;
+        let code = String.new(119); let done = false; let cancelled = false;
+        do Screen.clearScreen();
+        do Game.text(1, "IMPORT SAVE - type hexadecimal digits");
+        do Game.text(3, "Enter: restore   Backspace: edit   Esc: cancel");
+        do Game.text(11, "Spaces ignored. Rejoin exported lines without Enter.");
+        while (~done) {
+            // Redraw only the three input lines; never spill into instructions.
+            do Game.text(5, "                                                ");
+            do Game.text(6, "                                                ");
+            do Game.text(7, "                                                ");
+            let i = 0; let row = 5; let col = 1;
+            while (i < code.length()) {
+                do Output.moveCursor(row, col); do Output.printChar(code.charAt(i));
+                let col = col + 1;
+                if (col = 49) { let row = row + 1; let col = 1; }
+                let i = i + 1;
+            }
+            do Output.moveCursor(row, col); do Output.printChar(95);
+            let key = Game.readReleased();
+            if (key = 140) { let cancelled = true; let done = true; }
+            if (key = 128) { let done = true; }
+            if ((key = 129) & (code.length() > 0)) { do code.eraseLastChar(); }
+            if ((SaveCodec.digit(key) > -1) & (code.length() < 119)) {
+                if ((key > 96) & (key < 103)) { let key = key - 32; }
+                do code.appendChar(key);
+            }
+        }
+        let ok = false;
+        if (~cancelled) { let ok = SaveCodec.decode(code, board); }
+        do code.dispose(); return ok;
+    }
+}

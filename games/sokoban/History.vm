@@ -1,0 +1,140 @@
+function History.new 0
+    push constant 4
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 512
+    call Array.new 1
+    pop this 0
+    push constant 512
+    call Array.new 1
+    pop this 1
+    push constant 0
+    pop this 2
+    push constant 0
+    pop this 3
+    push pointer 0
+    return
+function History.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Array.dispose 1
+    pop temp 0
+    push this 1
+    call Array.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function History.clear 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop this 2
+    push constant 0
+    pop this 3
+    push constant 0
+    return
+function History.push 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    push this 0
+    add
+    push argument 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push this 2
+    push this 1
+    add
+    push argument 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push this 2
+    push constant 1
+    add
+    push constant 512
+    eq
+    not
+    if-goto ELSE$1
+    push constant 0
+    pop this 2
+    goto ENDIF$2
+label ELSE$1
+    push this 2
+    push constant 1
+    add
+    pop this 2
+label ENDIF$2
+    push this 3
+    push constant 512
+    lt
+    not
+    if-goto ELSE$4
+    push this 3
+    push constant 1
+    add
+    pop this 3
+    goto ENDIF$5
+label ELSE$4
+label ENDIF$5
+    push constant 0
+    return
+function History.pop 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    push constant 0
+    eq
+    not
+    if-goto ELSE$7
+    push constant 0
+    return
+    goto ENDIF$8
+label ELSE$7
+label ENDIF$8
+    push this 2
+    push constant 0
+    eq
+    not
+    if-goto ELSE$10
+    push constant 511
+    pop this 2
+    goto ENDIF$11
+label ELSE$10
+    push this 2
+    push constant 1
+    sub
+    pop this 2
+label ENDIF$11
+    push this 3
+    push constant 1
+    sub
+    pop this 3
+    push constant 1
+    neg
+    return
+function History.getPosition 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push this 2
+    add
+    pop pointer 1
+    push that 0
+    return
+function History.getAction 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 2
+    add
+    pop pointer 1
+    push that 0
+    return
